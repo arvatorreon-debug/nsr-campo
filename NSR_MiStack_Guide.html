@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Mi Stack · NSR</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #0A1628;
+  --bg2:    #0F1E35;
+  --bg3:    #162540;
+  --orange: #F0742B;
+  --orange2:#C9541A;
+  --gold:   #F5C542;
+  --white:  #F2F0EC;
+  --gray:   rgba(242,240,236,0.5);
+  --gray2:  rgba(242,240,236,0.2);
+  --green:  #2ECC71;
+  --blue:   #3498DB;
+  --border: rgba(255,255,255,0.06);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { font-size:16px; scroll-behavior:smooth; }
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  padding-bottom: 60px;
+  min-height: 100vh;
+}
+
+/* ── NOISE TEXTURE ── */
+body::before {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.4;
+}
+
+/* ── HEADER ── */
+.hero {
+  position: relative; z-index:1;
+  padding: 48px 20px 32px;
+  background: linear-gradient(180deg, rgba(240,116,43,0.12) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+}
+.hero-eyebrow {
+  font-size:11px; font-weight:700; letter-spacing:4px;
+  text-transform:uppercase; color:var(--orange);
+  margin-bottom:14px;
+}
+.hero-title {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:clamp(52px,14vw,72px);
+  line-height:0.92; letter-spacing:2px;
+  color:var(--white); margin-bottom:6px;
+}
+.hero-title span { color:var(--orange); }
+.hero-sub {
+  font-size:14px; color:var(--gray); line-height:1.5;
+  margin-top:14px; max-width:340px;
+}
+.hero-badge {
+  display:inline-flex; align-items:center; gap:7px;
+  margin-top:18px;
+  background:rgba(240,116,43,0.1); border:1px solid rgba(240,116,43,0.3);
+  border-radius:30px; padding:6px 14px;
+  font-size:12px; font-weight:700; color:var(--orange); letter-spacing:1px;
+}
+.hero-badge::before { content:''; width:7px; height:7px; background:var(--orange); border-radius:50%; animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+/* ── NAV TABS ── */
+.nav {
+  display:flex; overflow-x:auto; gap:0;
+  background:var(--bg2); border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:99;
+  scrollbar-width:none;
+}
+.nav::-webkit-scrollbar { display:none; }
+.nav-tab {
+  flex-shrink:0; padding:11px 15px;
+  font-size:12px; font-weight:700; letter-spacing:0.3px;
+  color:var(--gray2); cursor:pointer; white-space:nowrap;
+  border-bottom:2px solid transparent; transition:all 0.2s;
+}
+.nav-tab.active { color:var(--orange); border-bottom-color:var(--orange); }
+
+/* ── SECTIONS ── */
+.section { display:none; position:relative; z-index:1; }
+.section.active { display:block; }
+
+/* ── TOOL CARD HERO ── */
+.tool-hero {
+  padding:24px 20px 0;
+  display:flex; align-items:flex-start; gap:16px;
+}
+.tool-icon-big {
+  width:64px; height:64px; border-radius:18px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:30px;
+}
+.tool-name {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:38px; letter-spacing:1px; line-height:1; color:var(--white);
+}
+.tool-tagline { font-size:13px; color:var(--gray); margin-top:4px; line-height:1.4; }
+.tool-price-tag {
+  margin-top:8px; display:inline-flex; align-items:center; gap:6px;
+  background:rgba(46,204,113,0.1); border:1px solid rgba(46,204,113,0.3);
+  border-radius:20px; padding:4px 12px;
+  font-size:11px; font-weight:700; color:var(--green); letter-spacing:1px;
+}
+
+/* ── CONTENT BLOCKS ── */
+.blocks { padding:20px; display:flex; flex-direction:column; gap:14px; }
+
+.block {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:16px; overflow:hidden;
+}
+.block-header {
+  padding:14px 16px 0;
+  font-size:10px; font-weight:700; letter-spacing:3px;
+  text-transform:uppercase; color:var(--orange);
+  margin-bottom:10px;
+}
+.block-body { padding:0 16px 16px; }
+
+.block.dark { background:var(--bg3); }
+.block.accent { background:rgba(240,116,43,0.07); border-color:rgba(240,116,43,0.2); }
+
+/* Definition */
+.definition {
+  font-size:15px; color:var(--white); line-height:1.6; font-weight:500;
+}
+.definition em { color:var(--gray); font-style:normal; font-weight:400; }
+
+/* How it works steps */
+.steps { display:flex; flex-direction:column; gap:10px; }
+.step { display:flex; gap:12px; align-items:flex-start; }
+.step-num {
+  width:28px; height:28px; border-radius:8px;
+  background:var(--orange); color:#fff;
+  font-size:13px; font-weight:900; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.step-num.ghost { background:transparent; border:1px solid var(--border); color:var(--gray2); }
+.step-text { font-size:13.5px; color:var(--gray); line-height:1.5; padding-top:4px; }
+.step-text strong { color:var(--white); display:block; margin-bottom:1px; }
+.step-arrow { font-size:18px; color:var(--orange); align-self:center; flex-shrink:0; }
+
+/* Benefits */
+.benefits { display:flex; flex-direction:column; gap:8px; }
+.benefit { display:flex; gap:10px; align-items:flex-start; }
+.benefit-dot { width:6px; height:6px; background:var(--orange); border-radius:50%; flex-shrink:0; margin-top:7px; }
+.benefit-text { font-size:13.5px; color:var(--gray); line-height:1.45; }
+.benefit-text strong { color:var(--white); }
+
+/* Speech box */
+.speech-box {
+  background:rgba(240,116,43,0.06); border:1px solid rgba(240,116,43,0.2);
+  border-left:3px solid var(--orange);
+  border-radius:0 12px 12px 0;
+  padding:14px 16px;
+  font-size:13.5px; color:var(--white); line-height:1.6; font-style:italic;
+}
+.speech-label {
+  font-size:10px; font-weight:700; letter-spacing:2px;
+  text-transform:uppercase; color:var(--orange); margin-bottom:8px;
+  font-style:normal;
+}
+
+/* Combo tag */
+.combo-tags { display:flex; flex-wrap:wrap; gap:7px; }
+.combo-tag {
+  background:rgba(255,255,255,0.05); border:1px solid var(--border);
+  border-radius:20px; padding:5px 12px;
+  font-size:12px; font-weight:700; color:var(--gray);
+}
+.combo-tag.hot { background:rgba(240,116,43,0.1); border-color:rgba(240,116,43,0.3); color:var(--orange); }
+
+/* Real example */
+.example-box {
+  background:var(--bg3); border-radius:12px; padding:14px;
+  font-size:13px; color:var(--gray); line-height:1.55;
+  border-left:3px solid var(--gold);
+}
+.example-box strong { color:var(--gold); display:block; font-size:11px; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+
+/* Objection */
+.obj-box {
+  background:rgba(231,76,60,0.06); border:1px solid rgba(231,76,60,0.2);
+  border-radius:12px; padding:14px 16px; margin-bottom:10px;
+}
+.obj-q { font-size:13px; font-weight:700; color:#e74c3c; margin-bottom:8px; }
+.obj-a { font-size:13.5px; color:var(--gray); line-height:1.5; }
+
+/* Divider */
+.divider { height:1px; background:var(--border); margin:4px 0; }
+
+/* ── OVERVIEW SECTION ── */
+.overview-grid { padding:20px; display:flex; flex-direction:column; gap:12px; }
+.ov-card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:16px; padding:16px;
+  display:flex; gap:14px; align-items:flex-start;
+  cursor:pointer; transition:border-color 0.2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.ov-card:active { border-color:var(--orange); }
+.ov-icon { width:46px; height:46px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.ov-name { font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:1px; line-height:1; }
+.ov-sub { font-size:12px; color:var(--gray); margin-top:3px; line-height:1.3; }
+.ov-pill {
+  margin-top:6px; display:inline-flex;
+  background:rgba(46,204,113,0.1); border:1px solid rgba(46,204,113,0.25);
+  border-radius:20px; padding:3px 10px;
+  font-size:10px; font-weight:700; color:var(--green); letter-spacing:1px;
+}
+.ov-arrow { margin-left:auto; font-size:20px; color:var(--gray2); align-self:center; flex-shrink:0; }
+
+.overview-intro {
+  padding:20px 20px 0;
+  font-size:13.5px; color:var(--gray); line-height:1.6;
+}
+.overview-intro strong { color:var(--white); }
+
+/* ── PWA SECTION ── */
+.pwa-section { padding:20px; }
+
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Negocio Sin Rodeos · Tu arsenal</div>
+  <div class="hero-title">MI<br><span>STACK</span></div>
+  <p class="hero-sub">Todo lo que ofrezco, cómo funciona, qué decirle al cliente cuando pregunta.</p>
+  <div class="hero-badge">Guía de referencia rápida</div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-tab active" onclick="showTab('overview')">📦 Overview</div>
+  <div class="nav-tab" onclick="showTab('excel')">📊 Excel</div>
+  <div class="nav-tab" onclick="showTab('notion')">🗂️ Notion</div>
+  <div class="nav-tab" onclick="showTab('forms')">📝 Forms</div>
+  <div class="nav-tab" onclick="showTab('make')">⚙️ Make</div>
+  <div class="nav-tab" onclick="showTab('github')">🌐 GitHub</div>
+  <div class="nav-tab" onclick="showTab('pwa')">📱 PWA</div>
+</div>
+
+<!-- ══════════════════ OVERVIEW ══════════════════ -->
+<div class="section active" id="s-overview">
+  <div class="overview-intro">
+    Estas son las 6 herramientas de tu stack. <strong>Todas gratuitas o casi.</strong> Cada una resuelve un problema específico en la operación de una cafetería. Las combinas según lo que necesite el cliente.
+  </div>
+  <div class="overview-grid">
+    <div class="ov-card" onclick="showTab('excel')">
+      <div class="ov-icon" style="background:rgba(33,115,70,0.15)">📊</div>
+      <div>
+        <div class="ov-name" style="color:#27AE60">Excel a medida</div>
+        <div class="ov-sub">Control de ventas, caja, inventario y gastos — sin apps caras</div>
+        <div class="ov-pill">GRATIS para el cliente</div>
+      </div>
+      <div class="ov-arrow">›</div>
+    </div>
+    <div class="ov-card" onclick="showTab('notion')">
+      <div class="ov-icon" style="background:rgba(255,255,255,0.06)">🗂️</div>
+      <div>
+        <div class="ov-name">Notion</div>
+        <div class="ov-sub">Base de operaciones digital: recetas, inventario, checklists, pedidos</div>
+        <div class="ov-pill">GRATIS hasta cierto uso</div>
+      </div>
+      <div class="ov-arrow">›</div>
+    </div>
+    <div class="ov-card" onclick="showTab('forms')">
+      <div class="ov-icon" style="background:rgba(52,152,219,0.15)">📝</div>
+      <div>
+        <div class="ov-name" style="color:#3498DB">Forms / Tally</div>
+        <div class="ov-sub">Captura de pedidos, feedback de clientes y checklists en el celular</div>
+        <div class="ov-pill">GRATIS</div>
+      </div>
+      <div class="ov-arrow">›</div>
+    </div>
+    <div class="ov-card" onclick="showTab('make')">
+      <div class="ov-icon" style="background:rgba(155,89,182,0.15)">⚙️</div>
+      <div>
+        <div class="ov-name" style="color:#9B59B6">Make.com</div>
+        <div class="ov-sub">El cerebro que conecta todo y hace que las cosas pasen solas</div>
+        <div class="ov-pill">GRATIS 1,000 ops/mes</div>
+      </div>
+      <div class="ov-arrow">›</div>
+    </div>
+    <div class="ov-card" onclick="showTab('github')">
+      <div class="ov-icon" style="background:rgba(255,255,255,0.06)">🌐</div>
+      <div>
+        <div class="ov-name">GitHub Pages</div>
+        <div class="ov-sub">Hosting gratis para páginas web de clientes y tus propias herramientas</div>
+        <div class="ov-pill">GRATIS</div>
+      </div>
+      <div class="ov-arrow">›</div>
+    </div>
+    <div class="ov-card" onclick="showTab('pwa')">
+      <div class="ov-icon" style="background:rgba(240,116,43,0.15)">📱</div>
+      <div>
+        <div class="ov-name" style="color:var(--orange)">PWA</div>
+        <div class="ov-sub">Tu "app" instalable en cualquier celular, sin Play Store, sin costo</div>
+        <div class="ov-pill">GRATIS</div>
+      </div>
+      <div class="ov-arrow">›</div>
+    </div>
+  </div>
+
+  <!-- Combos -->
+  <div class="blocks">
+    <div class="block accent">
+      <div class="block-header">Combos más vendidos para cafeterías</div>
+      <div class="block-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num" style="background:#27AE60;font-size:11px">A</div>
+            <div class="step-text"><strong>Paquete Esencial — $2,500</strong>Excel + checklist en Forms + recetario en Notion</div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="font-size:11px">B</div>
+            <div class="step-text"><strong>Sistema Completo — $3,800 ⭐</strong>Todo lo anterior + Make conectando todo + pedidos digitales + página en GitHub</div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:#9B59B6;font-size:11px">C</div>
+            <div class="step-text"><strong>Membresía — $800/mes</strong>Mantenimiento de todos los sistemas + nuevas automatizaciones + soporte</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ EXCEL ══════════════════ -->
+<div class="section" id="s-excel">
+  <div class="tool-hero">
+    <div class="tool-icon-big" style="background:rgba(33,115,70,0.15)">📊</div>
+    <div>
+      <div class="tool-name" style="color:#27AE60">Excel</div>
+      <div class="tool-tagline">Control financiero sin apps caras ni suscripciones</div>
+      <div class="tool-price-tag">Gratis para el cliente · Tú cobras el tiempo</div>
+    </div>
+  </div>
+  <div class="blocks">
+
+    <div class="block">
+      <div class="block-header">Qué es</div>
+      <div class="block-body">
+        <p class="definition">Microsoft Excel — la hoja de cálculo que el 90% de los negocios ya tiene pero <em>nadie usa bien</em>. Lo que yo hago es armar fórmulas y automatizaciones dentro del mismo Excel para que el dueño capture datos simples y el archivo haga el análisis solo.</p>
+      </div>
+    </div>
+
+    <div class="block dark">
+      <div class="block-header">Qué entrego para cafeterías</div>
+      <div class="block-body">
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Registro de ventas diarias</strong>El dueño captura el total del día en 30 segundos. Excel calcula semana, mes, tendencia.</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Corte de caja automático</strong>Entradas vs salidas vs lo que debería haber. Detecta diferencias al instante.</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Inventario con alertas</strong>Cuando un ingrediente baja del mínimo, la celda se pone roja. Sin sistemas caros.</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Costeo de bebidas</strong>Cuánto cuesta hacer cada producto vs cuánto se vende → margen real por bebida.</div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Punto de equilibrio</strong>Cuánto necesita vender al mes para no perder. Muchos dueños nunca han calculado esto.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">Por qué Excel y no una app</div>
+      <div class="block-body">
+        <div class="benefits">
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text"><strong>Cero suscripción mensual</strong> — el cliente ya tiene Office o usa la versión gratuita online</div></div>
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text"><strong>Lo entiende cualquiera</strong> — no hay que capacitar a nadie en una app nueva</div></div>
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text"><strong>Tú lo adaptas en minutos</strong> — si cambia el menú, modificas el archivo en 5 minutos</div></div>
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text"><strong>El archivo es del cliente</strong> — no depende de que una empresa siga existiendo</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block accent">
+      <div class="block-header">Qué decirle al cliente</div>
+      <div class="block-body">
+        <div class="speech-box">
+          <div class="speech-label">Cuando pregunta "¿por qué Excel y no QuickBooks o alguna app?"</div>
+          "Porque QuickBooks te cuesta $300 pesos al mes y requiere que alguien lo aprenda. El archivo de Excel lo hago a la medida de tu cafetería, es tuyo para siempre, funciona offline, y tu empleado solo tiene que abrir el archivo y capturar un número. Nada más."
+        </div>
+        <div class="speech-box" style="margin-top:10px">
+          <div class="speech-label">Cuando pregunta "¿qué tan complicado es usarlo?"</div>
+          "Muy sencillo. Al empleado solo le aparecen las celdas donde tiene que escribir — el resto está bloqueado. Es como llenar un formulario. Lo enseño en la capacitación y en 20 minutos ya saben usarlo."
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">Objeción más común</div>
+      <div class="block-body">
+        <div class="obj-box">
+          <div class="obj-q">"Ya llevo mis cuentas en un cuaderno / en mi cabeza"</div>
+          <div class="obj-a">Perfecto. ¿Y cuánto gastaste exactamente el mes pasado en insumos? ¿Cuál fue tu bebida más rentable? ¿Cuánto necesitas vender al día para no perder? El cuaderno guarda datos — Excel los convierte en respuestas.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="example-box" style="margin:0 20px 20px">
+      <strong>Ejemplo real — Cafetería Torreón</strong>
+      Dueña llevaba sus gastos en cuaderno. Con el archivo de costeo descubrió que su café frío tenía 8% de margen real cuando ella creía que era 40%. Subió el precio $8 pesos y recuperó $4,200 pesos al mes. Eso justificó el paquete A en la primera semana.
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════ NOTION ══════════════════ -->
+<div class="section" id="s-notion">
+  <div class="tool-hero">
+    <div class="tool-icon-big" style="background:rgba(255,255,255,0.07)">🗂️</div>
+    <div>
+      <div class="tool-name">Notion</div>
+      <div class="tool-tagline">El cerebro digital de la operación diaria</div>
+      <div class="tool-price-tag">Gratis para equipos pequeños</div>
+    </div>
+  </div>
+  <div class="blocks">
+
+    <div class="block">
+      <div class="block-header">Qué es (sin tecnicismos)</div>
+      <div class="block-body">
+        <p class="definition">Notion es como un cuaderno inteligente que vive en internet y que todo tu equipo puede ver desde su celular al mismo tiempo. <em>Puedes crear bases de datos, listas, documentos y formularios — todo en un solo lugar.</em></p>
+      </div>
+    </div>
+
+    <div class="block dark">
+      <div class="block-header">Cómo lo uso para cafeterías</div>
+      <div class="block-body">
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Recetario estandarizado</strong>Cada bebida con foto, ingredientes exactos, cantidades, costo real. El barista lo consulta en su cel. Elimina el "es que yo no sé cómo lo hace el dueño".</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Inventario visual</strong>Lista de todos los insumos con stock actual, mínimo y proveedor. Cualquiera puede actualizar desde su cel.</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Checklists apertura y cierre</strong>El empleado va palomeando cada paso. El dueño ve si se completó todo sin estar presente.</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Base de clientes frecuentes</strong>Nombre, bebida favorita, fecha de última visita. Se puede conectar con Make para mandar WhatsApp automático de cumpleaños.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block accent">
+      <div class="block-header">Qué decirle al cliente</div>
+      <div class="block-body">
+        <div class="speech-box">
+          <div class="speech-label">Cuando pregunta "¿qué es Notion?"</div>
+          "Es como tener todos los documentos de tu cafetería organizados en el celular — recetas, inventario, checklist de apertura, todo. Tu empleado entra, ve lo que tiene que hacer y lo palomea. Tú desde donde estés puedes ver si ya se hizo. Y es gratis."
+        </div>
+        <div class="speech-box" style="margin-top:10px">
+          <div class="speech-label">Cuando pregunta "¿y si mis empleados no saben usarlo?"</div>
+          "Por eso incluyo capacitación. Son 20 minutos. Si saben usar WhatsApp, saben usar Notion — es igual de sencillo en el celular."
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">El argumento que más cierra</div>
+      <div class="block-body">
+        <div class="example-box" style="margin:0; border-left-color:var(--orange)">
+          <strong>El problema de la dependencia</strong>
+          "¿Qué pasa si usted se enferma una semana? ¿Sabe su empleado cómo preparar todas las bebidas exactamente como usted las hace? ¿Sabe qué hay que pedir al proveedor? Con Notion, todo eso está documentado y cualquiera puede operar el negocio aunque usted no esté."
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════ FORMS ══════════════════ -->
+<div class="section" id="s-forms">
+  <div class="tool-hero">
+    <div class="tool-icon-big" style="background:rgba(52,152,219,0.15)">📝</div>
+    <div>
+      <div class="tool-name" style="color:#3498DB">Forms / Tally</div>
+      <div class="tool-tagline">Captura de datos desde cualquier celular, sin instalar nada</div>
+      <div class="tool-price-tag">100% gratuito</div>
+    </div>
+  </div>
+  <div class="blocks">
+
+    <div class="block">
+      <div class="block-header">Qué es la diferencia entre los dos</div>
+      <div class="block-body">
+        <div class="step" style="margin-bottom:12px">
+          <div class="step-num" style="background:#3498DB;font-size:11px">G</div>
+          <div class="step-text"><strong>Google Forms</strong> — el clásico. Gratis, fácil, las respuestas van directo a Google Sheets. Perfecto para cuando el cliente ya usa Gmail.</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:#2C3E50;font-size:11px">T</div>
+          <div class="step-text"><strong>Tally</strong> — más bonito y moderno que Google Forms. También gratis. Mejor para formularios que van a ver los clientes finales (encuesta de satisfacción, pedidos en mesa).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block dark">
+      <div class="block-header">Cómo los uso en cafeterías</div>
+      <div class="block-body">
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Sistema de pedidos para meseros</strong>Mesero abre el form en su cel, selecciona mesa y bebidas, envía. Pedido llega a Sheets en tiempo real. El dueño ve todo desde su cel.</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Checklist de apertura/cierre</strong>Empleado llena el form al abrir y cerrar. Las respuestas quedan guardadas con fecha y hora. El dueño tiene evidencia de que se hizo.</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Encuesta de satisfacción</strong>QR en la mesa → cliente escanea → califica experiencia → Make manda alerta al dueño si alguien pone mal rating.</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Registro de merma</strong>El barista reporta lo que se tiró/venció. El dueño ve la merma acumulada del mes sin tener que preguntar.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block accent">
+      <div class="block-header">Qué decirle al cliente</div>
+      <div class="block-body">
+        <div class="speech-box">
+          <div class="speech-label">Cuando pregunta cómo funciona el sistema de pedidos</div>
+          "Su mesero abre un link en el celular — no tiene que instalar nada — y aparece el menú. Selecciona la mesa, las bebidas, lo que el cliente quiere. Le da enviar y ese pedido aparece en una pantalla en su cocina y en su celular en tiempo real. Usted sabe cuánto lleva vendido en el día sin tener que preguntar nada."
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">La pregunta que siempre hace el cliente</div>
+      <div class="block-body">
+        <div class="obj-box">
+          <div class="obj-q">"¿Y si no hay internet?"</div>
+          <div class="obj-a">Buena pregunta. Para el sistema de pedidos sí se necesita WiFi — pero hoy en día toda cafetería que se respete ya tiene WiFi. De hecho, si no tienen WiFi para sus clientes, eso también se lo podemos resolver porque es lo mínimo que debería tener un negocio en 2025. Y si se cae el internet, el mesero regresa al papel mientras se restablece — no es el fin del mundo.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════ MAKE ══════════════════ -->
+<div class="section" id="s-make">
+  <div class="tool-hero">
+    <div class="tool-icon-big" style="background:rgba(155,89,182,0.15)">⚙️</div>
+    <div>
+      <div class="tool-name" style="color:#9B59B6">Make.com</div>
+      <div class="tool-tagline">El robot que conecta todas tus herramientas</div>
+      <div class="tool-price-tag">Gratis · 1,000 operaciones/mes</div>
+    </div>
+  </div>
+  <div class="blocks">
+
+    <div class="block">
+      <div class="block-header">Qué es (sin tecnicismos)</div>
+      <div class="block-body">
+        <p class="definition">Make es como un asistente invisible que está monitoreando tus herramientas 24/7. <em>Cuando pasa algo en un lugar, Make lo detecta y automáticamente hace algo en otro lugar — sin que nadie tenga que hacerlo a mano.</em></p>
+      </div>
+    </div>
+
+    <div class="block dark">
+      <div class="block-header">Cómo funciona — la lógica</div>
+      <div class="block-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">Si</div>
+            <div class="step-text" style="color:var(--white)">Pasa algo (un pedido, un formulario lleno, un horario)</div>
+          </div>
+          <div class="step">
+            <div class="step-arrow">↓</div>
+            <div class="step-text" style="color:var(--gray)">Make lo detecta automáticamente</div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:var(--green)">→</div>
+            <div class="step-text" style="color:var(--white)">Entonces pasa otra cosa (una notificación, un registro, un descuento de inventario)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">Automatizaciones reales para cafeterías</div>
+      <div class="block-body">
+        <div class="benefits">
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text"><strong>Pedido entra por el form →</strong> Make lo registra en Sheets + manda notificación a cocina por WhatsApp</div></div>
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text"><strong>Cliente da 1 estrella en la encuesta →</strong> Make manda alerta inmediata al dueño</div></div>
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text"><strong>Cada noche a las 10pm →</strong> Make manda resumen del día al dueño por WhatsApp</div></div>
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text"><strong>Insumo llega al mínimo en Notion →</strong> Make manda recordatorio de compra al dueño</div></div>
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text"><strong>Cliente frecuente cumple años →</strong> Make manda mensaje automático de felicitación con descuento</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block accent">
+      <div class="block-header">Qué decirle al cliente</div>
+      <div class="block-body">
+        <div class="speech-box">
+          <div class="speech-label">La explicación más sencilla que existe</div>
+          "¿Ha visto cuando recibe un mensaje automático de su banco cuando hace un pago? Eso es una automatización — el banco no tiene a alguien mandando mensajes, es un sistema que lo hace solo. Lo mismo hago yo para su cafetería: conecto sus herramientas para que las cosas importantes pasen solas, sin que usted o su empleado tengan que hacer nada extra."
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">La pregunta difícil</div>
+      <div class="block-body">
+        <div class="obj-box">
+          <div class="obj-q">"¿Y si Make se cae o deja de funcionar?"</div>
+          <div class="obj-a">Buena pregunta. Make tiene 99.9% de uptime — prácticamente nunca se cae. Y si algo falla, las herramientas base (Notion, Sheets, Forms) siguen funcionando perfectamente, solo sin la automatización. Es como si se te va la luz — el negocio sigue operando, solo sin el extra. Y en el plan de membresía yo monitoreo que todo esté funcionando.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════ GITHUB ══════════════════ -->
+<div class="section" id="s-github">
+  <div class="tool-hero">
+    <div class="tool-icon-big" style="background:rgba(255,255,255,0.07)">🌐</div>
+    <div>
+      <div class="tool-name">GitHub Pages</div>
+      <div class="tool-tagline">Hosting gratuito para páginas web profesionales</div>
+      <div class="tool-price-tag">100% gratuito · Hosting para siempre</div>
+    </div>
+  </div>
+  <div class="blocks">
+
+    <div class="block">
+      <div class="block-header">Qué es (sin tecnicismos)</div>
+      <div class="block-body">
+        <p class="definition">GitHub es donde los programadores guardan su código. Pero tiene una función llamada Pages que permite publicar páginas web gratis. <em>Yo la uso para crear páginas simples para clientes sin que paguen hosting ni dominio.</em></p>
+      </div>
+    </div>
+
+    <div class="block dark">
+      <div class="block-header">Qué puedo hacer para una cafetería</div>
+      <div class="block-body">
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Página de menú digital</strong>Menú bonito con foto, precios, horarios y botón de WhatsApp. El cliente la manda por WhatsApp o la pone en su bio de Instagram. Carga rápido, se ve profesional.</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Formularios instalables (PWA)</strong>El sistema de pedidos o checklists empaquetado como "app" que se instala en el homescreen del cel del mesero.</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Página de Google Maps profesional</strong>Link directo a su ubicación + fotos + horarios. Para el negocio que no tiene ni presencia en internet todavía.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block accent">
+      <div class="block-header">Qué decirle al cliente</div>
+      <div class="block-body">
+        <div class="speech-box">
+          <div class="speech-label">Cuando pregunta cómo es posible que sea gratis</div>
+          "GitHub es una empresa de Microsoft que da hosting gratis para páginas simples — llevan más de 10 años haciéndolo. No es un servicio que va a desaparecer. La página de su cafetería va a estar online siempre sin pagar un peso de hosting. Lo único que podría costar es el dominio personalizado — algo como 'cafeteriaX.com' — que son unos $200 pesos al año, pero eso es opcional."
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">Cuándo lo recomiendas</div>
+      <div class="block-body">
+        <div class="benefits">
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text">El negocio <strong>no tiene página web</strong> ni presencia digital</div></div>
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text">Quiere un <strong>menú digital</strong> para mandar por WhatsApp en lugar de foto del pizarrón</div></div>
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text">Necesita que el <strong>sistema de pedidos se instale</strong> como app en el cel de los meseros</div></div>
+          <div class="benefit"><div class="benefit-dot"></div><div class="benefit-text">Quiere aparecer mejor en <strong>Google Maps</strong> con información completa</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════ PWA ══════════════════ -->
+<div class="section" id="s-pwa">
+  <div class="tool-hero">
+    <div class="tool-icon-big" style="background:rgba(240,116,43,0.15)">📱</div>
+    <div>
+      <div class="tool-name" style="color:var(--orange)">PWA</div>
+      <div class="tool-tagline">Progressive Web App — la "app" sin Play Store</div>
+      <div class="tool-price-tag">Gratis · Sin Play Store · Sin aprobación</div>
+    </div>
+  </div>
+  <div class="blocks">
+
+    <div class="block">
+      <div class="block-header">Qué es (explicación simple)</div>
+      <div class="block-body">
+        <p class="definition">Una PWA es una página web que se comporta como si fuera una app de celular. <em>Se instala en el homescreen con un ícono propio, se abre sin navegador y funciona sin estar en Play Store ni App Store.</em></p>
+      </div>
+    </div>
+
+    <div class="block dark">
+      <div class="block-header">Diferencia con una app normal</div>
+      <div class="block-body">
+        <div class="step" style="margin-bottom:14px">
+          <div class="step-num" style="background:#e74c3c;font-size:11px">App</div>
+          <div class="step-text">
+            <strong>App nativa (Play Store)</strong>
+            Cuesta mínimo $25 USD publicarla. Necesitas programador. Tarda semanas. Requiere aprobación de Google. Se actualiza por Play Store.
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:var(--orange);font-size:10px">PWA</div>
+          <div class="step-text">
+            <strong>PWA (lo que hago yo)</strong>
+            Costo: $0. Lo hago yo en HTML/CSS. Listo en horas. Se instala con 2 toques. Se actualiza automáticamente. Funciona en cualquier cel.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">Cómo la instala el cliente en 2 pasos</div>
+      <div class="block-body">
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text">Abre el link en Chrome o Brave</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text">Menú → "Añadir a pantalla de inicio" → confirmar. Aparece el ícono como app.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block accent">
+      <div class="block-header">Qué decirle al cliente</div>
+      <div class="block-body">
+        <div class="speech-box">
+          <div class="speech-label">Cuando pregunta si es una app de verdad</div>
+          "Se instala en el celular igual que una app, tiene su propio ícono, se abre sin abrir el navegador y funciona igual de rápido. La diferencia técnica existe, pero para uso diario no la nota nadie. Y lo mejor: no tiene que ir al Play Store, no tiene que crear cuenta, no tiene que actualizarla — yo la actualizo del lado y en el cel se refleja solo."
+        </div>
+        <div class="speech-box" style="margin-top:10px">
+          <div class="speech-label">Cuando el cliente compara con apps como iZettle o Square</div>
+          "Esas apps están bien para cobros con tarjeta. Lo que yo hago es diferente: control de operación, pedidos, inventario, reportes. Y a diferencia de ellas, no pago comisión por cada transacción ni mensualidad. Lo tuyo es tuyo."
+        </div>
+      </div>
+    </div>
+
+    <div class="example-box" style="margin:0 20px 20px">
+      <strong>Ejemplo que ya tienes funcionando</strong>
+      Esta misma guía que estás leyendo ahorita es una PWA. Se instaló en tu Redmi Note 14 Pro con 2 toques, tiene su ícono en el homescreen y funciona sin abrir el navegador. Exactamente eso le entrego al cliente para sus meseros.
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const map = {overview:0,excel:1,notion:2,forms:3,make:4,github:5,pwa:6};
+  if(map[id]!==undefined) tabs[map[id]].classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  // scroll tab into view
+  const activeTab = tabs[map[id]];
+  if(activeTab) activeTab.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+}
+</script>
+</body>
+</html>
