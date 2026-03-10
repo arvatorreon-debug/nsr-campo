@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Guía de Campo · NSR</title>
+<style>
+  :root {
+    --bg: #0D1B2A;
+    --bg2: #132234;
+    --bg3: #1A2E44;
+    --orange: #E67E22;
+    --orange2: #D35400;
+    --white: #FFFFFF;
+    --gray: rgba(255,255,255,0.55);
+    --gray2: rgba(255,255,255,0.25);
+    --green: #27AE60;
+    --red: #E74C3C;
+    --blue: #2E86C1;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.07);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+    line-height: 1.5;
+    padding-bottom: 80px;
+  }
+
+  /* ── HEADER FIJO ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,27,42,0.97);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .topbar-left { display:flex; align-items:center; gap:10px; }
+  .logo-n {
+    width:34px; height:34px; background:var(--orange); border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:18px; color:#fff; letter-spacing:-1px;
+  }
+  .topbar-title { font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--white); }
+  .topbar-sub { font-size:11px; color:var(--orange); font-weight:600; letter-spacing:1px; }
+  .badge-live {
+    background: rgba(39,174,96,0.15); border:1px solid rgba(39,174,96,0.4);
+    border-radius:20px; padding:4px 10px; font-size:11px; font-weight:700;
+    color: var(--green); letter-spacing:1px;
+    display:flex; align-items:center; gap:5px;
+  }
+  .badge-live::before { content:''; width:6px; height:6px; background:var(--green); border-radius:50%; display:inline-block; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── NAV TABS ── */
+  .nav-tabs {
+    display:flex; overflow-x:auto; gap:0;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    scrollbar-width:none;
+    position:sticky; top:61px; z-index:99;
+  }
+  .nav-tabs::-webkit-scrollbar { display:none; }
+  .tab {
+    flex-shrink:0; padding:10px 16px;
+    font-size:12px; font-weight:700; letter-spacing:0.5px;
+    color: var(--gray2); cursor:pointer;
+    border-bottom:2px solid transparent;
+    transition:all 0.2s; white-space:nowrap;
+  }
+  .tab.active { color:var(--orange); border-bottom-color:var(--orange); }
+  .tab:active { background:rgba(255,255,255,0.05); }
+
+  /* ── SECCIONES ── */
+  .section { display:none; padding:16px; }
+  .section.active { display:block; }
+
+  /* ── COMPONENTES ── */
+  .section-title {
+    font-size:11px; font-weight:700; letter-spacing:3px;
+    text-transform:uppercase; color:var(--orange);
+    margin-bottom:12px; margin-top:4px;
+  }
+
+  .card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:14px 16px; margin-bottom:12px;
+  }
+  .card-title { font-size:15px; font-weight:700; margin-bottom:6px; }
+  .card-body { font-size:13.5px; color:var(--gray); line-height:1.55; }
+
+  .card.orange-left { border-left:3px solid var(--orange); border-radius:0 14px 14px 0; }
+  .card.green-left  { border-left:3px solid var(--green);  border-radius:0 14px 14px 0; }
+  .card.red-left    { border-left:3px solid var(--red);    border-radius:0 14px 14px 0; }
+
+  /* Speech box */
+  .speech {
+    background: rgba(230,126,34,0.07);
+    border:1px solid rgba(230,126,34,0.2);
+    border-left:3px solid var(--orange);
+    border-radius:0 12px 12px 0;
+    padding:14px 16px; margin-bottom:12px;
+    font-size:13.5px; line-height:1.6; color:var(--white);
+    font-style:italic;
+  }
+  .speech .pause { color:var(--gray2); font-style:normal; font-size:12px; display:block; margin:6px 0; }
+
+  /* Info row */
+  .info-row {
+    display:flex; align-items:flex-start; gap:10px;
+    padding:10px 0; border-bottom:1px solid var(--border);
+  }
+  .info-row:last-child { border-bottom:none; }
+  .info-icon { font-size:18px; flex-shrink:0; margin-top:1px; }
+  .info-text { font-size:13.5px; color:var(--gray); flex:1; line-height:1.45; }
+  .info-text strong { color:var(--white); display:block; font-size:14px; margin-bottom:2px; }
+
+  /* Check list */
+  .checklist { list-style:none; }
+  .checklist li {
+    display:flex; align-items:flex-start; gap:10px;
+    padding:9px 0; border-bottom:1px solid var(--border);
+    font-size:13.5px; color:var(--gray);
+  }
+  .checklist li:last-child { border-bottom:none; }
+  .check-box {
+    width:20px; height:20px; border:2px solid var(--gray2);
+    border-radius:5px; flex-shrink:0; margin-top:1px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:all 0.15s;
+  }
+  .check-box.checked { background:var(--orange); border-color:var(--orange); }
+  .check-box.checked::after { content:'✓'; font-size:12px; color:#fff; font-weight:900; }
+
+  /* Objeción cards */
+  .obj-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:14px; margin-bottom:10px; overflow:hidden;
+  }
+  .obj-header {
+    padding:12px 16px; cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:8px;
+  }
+  .obj-header:active { background:rgba(255,255,255,0.03); }
+  .obj-q { font-size:14px; font-weight:700; color:var(--red); flex:1; }
+  .obj-arrow { font-size:16px; color:var(--gray2); transition:transform 0.2s; flex-shrink:0; }
+  .obj-card.open .obj-arrow { transform:rotate(90deg); color:var(--orange); }
+  .obj-body {
+    display:none; padding:0 16px 14px;
+    font-size:13.5px; color:var(--gray); line-height:1.55;
+  }
+  .obj-card.open .obj-body { display:block; }
+  .obj-tip {
+    margin-top:8px; padding:8px 12px;
+    background:rgba(46,134,193,0.1); border:1px solid rgba(46,134,193,0.25);
+    border-radius:8px; font-size:12px; color:#5dade2; font-style:italic;
+  }
+
+  /* Servicios pills */
+  .services-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+  .svc-pill {
+    background:rgba(230,126,34,0.1); border:1px solid rgba(230,126,34,0.3);
+    border-radius:20px; padding:6px 14px;
+    font-size:12.5px; font-weight:700; color:var(--orange);
+  }
+
+  /* Señales de cafetería */
+  .signal-row {
+    display:flex; align-items:flex-start; gap:12px;
+    padding:11px 0; border-bottom:1px solid var(--border);
+  }
+  .signal-row:last-child { border-bottom:none; }
+  .signal-icon { font-size:22px; flex-shrink:0; }
+  .signal-obs { font-size:14px; font-weight:700; color:var(--white); margin-bottom:2px; }
+  .signal-sig { font-size:12.5px; color:var(--orange); font-style:italic; }
+
+  /* Formato captura */
+  .field-label { font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--gray2); margin-bottom:6px; margin-top:14px; }
+  .field-input {
+    width:100%; background:rgba(255,255,255,0.05);
+    border:1px solid var(--border); border-radius:10px;
+    padding:10px 12px; color:var(--white); font-size:14px;
+    outline:none; font-family:inherit;
+  }
+  .field-input:focus { border-color:var(--orange); background:rgba(230,126,34,0.05); }
+  .field-input::placeholder { color:var(--gray2); }
+  textarea.field-input { resize:none; min-height:72px; }
+
+  .radio-group { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .radio-btn {
+    padding:7px 14px; border-radius:20px; font-size:13px; font-weight:700;
+    border:1px solid var(--border); color:var(--gray); cursor:pointer;
+    transition:all 0.15s; background:transparent;
+  }
+  .radio-btn.active { background:var(--orange); border-color:var(--orange); color:#fff; }
+
+  .interes-group { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px; }
+  .interes-btn {
+    padding:10px; border-radius:12px; font-size:13px; font-weight:700;
+    border:1px solid var(--border); color:var(--gray); cursor:pointer;
+    text-align:center; transition:all 0.15s; background:transparent;
+  }
+  .interes-btn.frio.active  { background:rgba(46,134,193,0.2); border-color:var(--blue); color:#5dade2; }
+  .interes-btn.tibio.active { background:rgba(230,126,34,0.2); border-color:var(--orange); color:var(--orange); }
+  .interes-btn.caliente.active { background:rgba(231,76,60,0.2); border-color:var(--red); color:#e74c3c; }
+  .interes-btn.agendo.active { background:rgba(39,174,96,0.2); border-color:var(--green); color:var(--green); }
+
+  .pasos-group { display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+  .paso-btn {
+    padding:10px 14px; border-radius:10px; font-size:13px; font-weight:700;
+    border:1px solid var(--border); color:var(--gray); cursor:pointer;
+    text-align:left; transition:all 0.15s; background:transparent;
+  }
+  .paso-btn.active { background:rgba(39,174,96,0.15); border-color:var(--green); color:var(--green); }
+
+  .btn-save {
+    width:100%; margin-top:20px; padding:16px;
+    background:linear-gradient(135deg, var(--orange), var(--orange2));
+    border:none; border-radius:14px; color:#fff;
+    font-size:16px; font-weight:800; letter-spacing:1px;
+    cursor:pointer; font-family:inherit;
+  }
+  .btn-save:active { opacity:0.85; }
+
+  .btn-clear {
+    width:100%; margin-top:10px; padding:13px;
+    background:transparent; border:1px solid var(--border);
+    border-radius:14px; color:var(--gray2);
+    font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;
+  }
+
+  /* Tag de problema */
+  .prob-tags { display:flex; flex-wrap:wrap; gap:7px; margin-top:6px; }
+  .prob-tag {
+    padding:7px 12px; border-radius:8px; font-size:12.5px; font-weight:700;
+    border:1px solid var(--border); color:var(--gray); cursor:pointer;
+    transition:all 0.15s; background:transparent;
+  }
+  .prob-tag.active { background:rgba(231,76,60,0.15); border-color:var(--red); color:#e74c3c; }
+
+  /* Toast */
+  .toast {
+    position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--green); color:#fff; padding:12px 24px;
+    border-radius:30px; font-size:14px; font-weight:700;
+    opacity:0; transition:all 0.3s; z-index:200; white-space:nowrap;
+    box-shadow:0 4px 20px rgba(0,0,0,0.4);
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* Bottom safe area */
+  .bottom-pad { height:20px; }
+
+  /* Horario table */
+  .horario-row {
+    display:flex; gap:10px; padding:9px 0;
+    border-bottom:1px solid var(--border);
+    font-size:13.5px;
+  }
+  .horario-row:last-child { border-bottom:none; }
+  .horario-time { color:var(--orange); font-weight:700; min-width:120px; flex-shrink:0; }
+  .horario-act { color:var(--gray); flex:1; }
+  .horario-why { font-size:11.5px; color:var(--gray2); margin-top:2px; }
+
+  /* Highlight box */
+  .highlight {
+    background:rgba(230,126,34,0.08); border:1px solid rgba(230,126,34,0.2);
+    border-radius:12px; padding:12px 14px; margin-bottom:12px;
+    font-size:13px; color:var(--white); line-height:1.55;
+  }
+  .highlight strong { color:var(--orange); }
+
+  /* Paquetes */
+  .pkg-row { display:flex; gap:8px; margin-bottom:12px; }
+  .pkg-card {
+    flex:1; background:var(--bg3); border-radius:12px;
+    padding:12px 10px; text-align:center; border:1px solid var(--border);
+  }
+  .pkg-card.star { background:linear-gradient(135deg, var(--orange), var(--orange2)); border-color:transparent; }
+  .pkg-letter { font-size:26px; font-weight:900; color:rgba(255,255,255,0.2); line-height:1; }
+  .pkg-card.star .pkg-letter { color:rgba(255,255,255,0.35); }
+  .pkg-name { font-size:11px; font-weight:700; color:#fff; margin:3px 0; line-height:1.2; }
+  .pkg-price { font-size:20px; font-weight:900; color:var(--orange); }
+  .pkg-card.star .pkg-price { color:#fff; }
+  .pkg-note { font-size:10px; color:rgba(255,255,255,0.4); }
+
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-n">N</div>
+    <div>
+      <div class="topbar-title">Guía de Campo</div>
+      <div class="topbar-sub">Negocio Sin Rodeos</div>
+    </div>
+  </div>
+  <div class="badge-live">EN RUTA</div>
+</div>
+
+<!-- TABS -->
+<div class="nav-tabs" id="navTabs">
+  <div class="tab active" onclick="showTab('antes')">🏠 Antes</div>
+  <div class="tab" onclick="showTab('leer')">👁 Leer</div>
+  <div class="tab" onclick="showTab('speech')">🎤 Speech</div>
+  <div class="tab" onclick="showTab('servicios')">🛠 Servicios</div>
+  <div class="tab" onclick="showTab('objeciones')">🛡 Objeciones</div>
+  <div class="tab" onclick="showTab('captura')">📋 Captura</div>
+  <div class="tab" onclick="showTab('tips')">📍 Tips</div>
+</div>
+
+<!-- ════════════════════════════════ ANTES ════════════ -->
+<div class="section active" id="s-antes">
+  <div class="section-title">0 · Antes de salir</div>
+
+  <div class="highlight">
+    Meta del día: <strong>CONTACTOS, no ventas.</strong> Hoy vendes el diagnóstico, no el paquete. 3 diagnósticos agendados = día exitoso.
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Checklist de salida</div>
+    <ul class="checklist" id="checkSalida">
+      <li><div class="check-box" onclick="toggleCheck(this)"></div>Teléfono cargado al 100%</li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div>Tarjetas de presentación (mínimo 20)</li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div>App de notas o libreta para capturar datos</li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div>Vestimenta casual profesional</li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div>Desayunado 😂</li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div>Ruta planeada en Google Maps</li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div>Speech practicado 3 veces en el coche</li>
+    </ul>
+  </div>
+
+  <div class="section-title">Horario ideal</div>
+  <div class="card">
+    <div class="horario-row"><div class="horario-time">8:00–8:30</div><div class="horario-act">Desplazamiento + revisar ruta<div class="horario-why">Los negocios abren, mejor encontrar al dueño</div></div></div>
+    <div class="horario-row"><div class="horario-time">8:30–11:00</div><div class="horario-act">Prospección activa (10–15 negocios)<div class="horario-why">Dueños presentes, antes del rush de mediodía</div></div></div>
+    <div class="horario-row"><div class="horario-time">11:00–12:00</div><div class="horario-act">Seguimiento WhatsApp de la mañana<div class="horario-why">Mientras el primer impacto está fresco</div></div></div>
+    <div class="horario-row"><div class="horario-time">12:00–13:00</div><div class="horario-act">Diagnósticos agendados o cierres<div class="horario-why">O propuestas por WhatsApp</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🧠 Mentalidad</div>
+    <div class="info-row"><div class="info-icon">🎯</div><div class="info-text"><strong>Eres el médico del negocio</strong>Entras a ayudar, no a vender.</div></div>
+    <div class="info-row"><div class="info-icon">📊</div><div class="info-text"><strong>Cada "no" te acerca al "sí"</strong>10 visitas = estadística, no fracaso.</div></div>
+    <div class="info-row"><div class="info-icon">⏱</div><div class="info-text"><strong>5 minutos por visita de entrada, máximo</strong>Si el dueño no está, dejas tarjeta y sigues.</div></div>
+    <div class="info-row"><div class="info-icon">🚫</div><div class="info-text"><strong>No improvises el speech</strong>Practícalo en el coche antes de entrar.</div></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ LEER ════════════ -->
+<div class="section" id="s-leer">
+  <div class="section-title">1 · Cómo leer una cafetería antes de entrar</div>
+  <div class="highlight">30 segundos de observación antes de abrir la puerta ya te dicen cómo entrar.</div>
+
+  <div class="card">
+    <div class="card-title">☕ Señales en cafeterías</div>
+    <div class="signal-row"><div class="signal-icon">📝</div><div><div class="signal-obs">¿Pedidos en papel o de memoria?</div><div class="signal-sig">→ Sistema de pedidos digital = oportunidad directa</div></div></div>
+    <div class="signal-row"><div class="signal-icon">🧾</div><div><div class="signal-obs">¿Hay menú en pizarrón o papel?</div><div class="signal-sig">→ Sin menú digital = sin sistema de control</div></div></div>
+    <div class="signal-row"><div class="signal-icon">👤</div><div><div class="signal-obs">¿El dueño está en caja o cocina?</div><div class="signal-sig">→ Si está en caja, habla con él directo</div></div></div>
+    <div class="signal-row"><div class="signal-icon">😶</div><div><div class="signal-obs">¿Vacío a las 9am?</div><div class="signal-sig">→ Problema de ventas o procesos</div></div></div>
+    <div class="signal-row"><div class="signal-icon">💰</div><div><div class="signal-obs">¿Sin precios visibles?</div><div class="signal-sig">→ Caos administrativo casi seguro</div></div></div>
+    <div class="signal-row"><div class="signal-icon">👥</div><div><div class="signal-obs">¿Cuántos empleados ves?</div><div class="signal-sig">→ 1-3 = decisión del dueño, proceso rápido</div></div></div>
+    <div class="signal-row"><div class="signal-icon">📱</div><div><div class="signal-obs">¿Usan celular para algo del negocio?</div><div class="signal-sig">→ Si no = Notion y forms va a fascinarles</div></div></div>
+  </div>
+
+  <div class="section-title">No digas / Sí di</div>
+  <div class="card red-left">
+    <div class="card-title" style="color:var(--red)">❌ Palabras prohibidas</div>
+    <div class="card-body">"Soy consultor de negocios" · "Sistema" · "Software" · "Automatización" · "Power BI" · hablar de precios en la primera visita</div>
+  </div>
+  <div class="card green-left">
+    <div class="card-title" style="color:var(--green)">✅ Usa esto</div>
+    <div class="card-body">"Ando haciendo un mapeo gratuito" · "Control" · "Orden" · "Dinero" · "¿Usted es el dueño?"</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ SPEECH ════════════ -->
+<div class="section" id="s-speech">
+  <div class="section-title">2 · El speech</div>
+
+  <div class="highlight">
+    <strong>Regla de oro:</strong> No entras a vender. Entras a regalar valor (el diagnóstico) y a conseguir un contacto.
+  </div>
+
+  <div class="section-title">Versión rápida — 30 segundos</div>
+  <div class="speech">
+    "Buenos días, soy José. Ando visitando cafeterías de la zona porque estoy haciendo un mapeo gratuito — básicamente reviso si hay dinero que se está yendo sin que el dueño se dé cuenta. Gastos hormiga, inventario que se pierde, pedidos que se pierden, ese tipo de cosas."
+    <span class="pause">[ Pausa 1 segundo ]</span>
+    "¿Usted es el dueño/a?"
+  </div>
+
+  <div class="section-title">Si te dan 2-3 minutos</div>
+  <div class="speech">
+    "Le cuento de qué va: reviso 6 áreas en su negocio — ventas, inventario, gastos, cómo trabaja su equipo, sus procesos del día a día y las finanzas básicas."
+    <span class="pause">[ Pausa ]</span>
+    "En una hora, sin interrumpir su operación, le entrego un reporte de 1 página con los puntos donde su negocio está perdiendo dinero — cuantificado en pesos."
+    <span class="pause">[ Pausa. Deja que aterrice. ]</span>
+    "La mayoría de las cafeterías que reviso tienen entre $3,000 y $8,000 pesos al mes en pérdidas que ni saben que tienen. Inventario que se va, pedidos que no se registran, gastos sin anotar."
+    <span class="pause">[ Pausa ]</span>
+    "El diagnóstico es completamente gratuito. Si después le interesa que le ayude, hablamos. Si no, se queda con el reporte y ya."
+    <span class="pause">[ Pregunta de cierre: ]</span>
+    "¿Le gustaría que lo agendemos para esta semana?"
+  </div>
+
+  <div class="section-title">Speech del sistema de pedidos</div>
+  <div class="speech">
+    "¿Sus meseros todavía apuntan los pedidos en papel? Con lo que yo hago, el mesero anota el pedido en el celular y usted lo ve al momento — cuánto lleva vendido en el día, qué bebidas van más, todo. Sin sistema caro, sin iPad, sin suscripción mensual."
+  </div>
+
+  <div class="section-title">Cierre de visita (siempre)</div>
+  <div class="speech">
+    "Muchas gracias por su tiempo. Le dejo mi tarjeta — si quiere agendar el diagnóstico gratuito, me escribe al WhatsApp y lo hacemos cuando le acomode."
+    <span class="pause">[ Da la mano, sonríe, sal. No te quedes esperando. ]</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ SERVICIOS ════════════ -->
+<div class="section" id="s-servicios">
+  <div class="section-title">3 · Qué ofrecemos — stack completo</div>
+
+  <div class="services-grid">
+    <div class="svc-pill">📊 Excel a medida</div>
+    <div class="svc-pill">🗂️ Notion</div>
+    <div class="svc-pill">📱 Pedidos digitales</div>
+    <div class="svc-pill">⚙️ Make.com</div>
+    <div class="svc-pill">📝 Formularios</div>
+    <div class="svc-pill">🌐 GitHub Pages</div>
+    <div class="svc-pill">📦 Inventarios</div>
+    <div class="svc-pill">🔄 Procesos</div>
+    <div class="svc-pill">👥 Capacitación</div>
+  </div>
+
+  <div class="card orange-left">
+    <div class="card-title">📱 Sistema de pedidos para meseros</div>
+    <div class="card-body">Mesero llena form en celular → pedido llega a Google Sheets o Notion → dueño ve en tiempo real. Sin apps, sin iPad, sin suscripción. Solo celular y WiFi.<br><br><em style="color:var(--orange)">Argumento: "¿Sus meseros todavía usan papel?"</em></div>
+  </div>
+
+  <div class="card orange-left">
+    <div class="card-title">📊 Control en Excel a medida</div>
+    <div class="card-body">Ventas diarias, corte de caja automático, inventario con alertas de reabastecimiento, recetario estandarizado. Sin apps caras ni suscripciones mensuales.</div>
+  </div>
+
+  <div class="card orange-left">
+    <div class="card-title">🗂️ Notion para la operación</div>
+    <div class="card-body">Inventario, recetas, checklists apertura/cierre, base de clientes frecuentes, pedidos. El equipo lo usa desde cualquier celular. <br><br><em style="color:var(--orange)">Pitch: "Como un cuaderno inteligente que le avisa cuando algo se acaba."</em></div>
+  </div>
+
+  <div class="card orange-left">
+    <div class="card-title">⚙️ Automatizaciones con Make</div>
+    <div class="card-body">Pedido entra → cocina lo ve → inventario se descuenta → dueño recibe resumen del día. Todo solo, sin que nadie tenga que hacer nada extra.</div>
+  </div>
+
+  <div class="card orange-left">
+    <div class="card-title">🌐 Página web en GitHub Pages</div>
+    <div class="card-body">Menú, horarios, ubicación, link de WhatsApp. Carga en 1 segundo, hosting gratis. Para el dueño que ni en Google Maps aparece bien.</div>
+  </div>
+
+  <div class="section-title">Paquetes</div>
+  <div class="pkg-row">
+    <div class="pkg-card">
+      <div class="pkg-letter">A</div>
+      <div class="pkg-name">Control Esencial</div>
+      <div class="pkg-price">$2,500</div>
+      <div class="pkg-note">1 semana</div>
+    </div>
+    <div class="pkg-card star">
+      <div class="pkg-letter">B</div>
+      <div class="pkg-name">Sistema Completo ⭐</div>
+      <div class="pkg-price">$3,800</div>
+      <div class="pkg-note">ROI: 3.2 meses</div>
+    </div>
+    <div class="pkg-card">
+      <div class="pkg-letter">C</div>
+      <div class="pkg-name">Membresía</div>
+      <div class="pkg-price">$800</div>
+      <div class="pkg-note">/mes</div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    Al presentar precios: <strong>nunca bajes precio sin quitar entregable.</strong> Si piden descuento: "Arrancamos con el A y en 30 días decides si subimos."
+  </div>
+</div>
+
+<!-- ════════════════════════════════ OBJECIONES ════════════ -->
+<div class="section" id="s-objeciones">
+  <div class="section-title">4 · Manejo de objeciones</div>
+  <div class="highlight">Toca cada objeción para ver la respuesta. <strong>Siempre habla en términos de dinero, no de tecnología.</strong></div>
+
+  <div class="obj-card" onclick="toggleObj(this)">
+    <div class="obj-header"><div class="obj-q">"Ahorita estoy ocupado"</div><div class="obj-arrow">›</div></div>
+    <div class="obj-body">Claro, no le quito más tiempo. Solo le dejo mi tarjeta — el diagnóstico lo podemos hacer cualquier día a la hora que mejor le quede, incluso antes de que abra o cuando cierra.<div class="obj-tip">💡 No te vayas sin tarjeta + conseguir un "¿cuándo podría ser?" aunque sea vago.</div></div>
+  </div>
+
+  <div class="obj-card" onclick="toggleObj(this)">
+    <div class="obj-header"><div class="obj-q">"Ya tengo todo controlado"</div><div class="obj-arrow">›</div></div>
+    <div class="obj-body">¿Sabe usted exactamente cuánto gana neto al mes después de pagar todo? Si la respuesta es sí, no necesita nada. Si hay algo de duda, vale la pena la revisión aunque sea de curiosidad.<div class="obj-tip">💡 El 90% duda al responder. Esa duda es tu apertura.</div></div>
+  </div>
+
+  <div class="obj-card" onclick="toggleObj(this)">
+    <div class="obj-header"><div class="obj-q">"No tengo dinero / está muy caro"</div><div class="obj-arrow">›</div></div>
+    <div class="obj-body">Entiendo. Por eso el diagnóstico es gratuito — así usted decide si hay algo que valga invertir. No hay que comprometer nada hoy.<div class="obj-tip">💡 Nunca menciones precios en el acercamiento. Si los mencionan, regresa al diagnóstico gratis.</div></div>
+  </div>
+
+  <div class="obj-card" onclick="toggleObj(this)">
+    <div class="obj-header"><div class="obj-q">"Ya tengo contador"</div><div class="obj-arrow">›</div></div>
+    <div class="obj-body">Qué bueno. Lo que hago es diferente al contador — no llevo libros ni hago declaraciones. Reviso la operación diaria: cómo fluye el negocio, dónde se escapa el dinero antes de que llegue al contador.<div class="obj-tip">💡 Contador ≠ consultor operativo. Hazlo claro sin restarle mérito al contador.</div></div>
+  </div>
+
+  <div class="obj-card" onclick="toggleObj(this)">
+    <div class="obj-header"><div class="obj-q">"Déjame pensarlo / ahorita no"</div><div class="obj-arrow">›</div></div>
+    <div class="obj-body">Claro. Para no molestarlo de nuevo, ¿me permite anotarle mi WhatsApp? Cuando quiera me escribe y lo agendamos. No hay ningún compromiso.<div class="obj-tip">💡 Sal del negocio con su número o con el tuyo dado. Sin contacto = visita perdida.</div></div>
+  </div>
+
+  <div class="obj-card" onclick="toggleObj(this)">
+    <div class="obj-header"><div class="obj-q">"¿Tú qué sabes de mi negocio?"</div><div class="obj-arrow">›</div></div>
+    <div class="obj-body">Tiene razón, todavía no sé nada. Por eso el diagnóstico — para conocerlo antes de opinar. He trabajado en operaciones de empresas por más de 10 años, desde hospitales hasta proyectos con Telmex, y los problemas operativos se parecen mucho en todos lados.<div class="obj-tip">💡 No te pongas a la defensiva. Valida su punto y usa tu experiencia con confianza.</div></div>
+  </div>
+
+  <div class="obj-card" onclick="toggleObj(this)">
+    <div class="obj-header"><div class="obj-q">"Mándame información por WhatsApp"</div><div class="obj-arrow">›</div></div>
+    <div class="obj-body">Con gusto. ¿Me da su número? Le mando un mensaje ahorita para que tenga el mío también y podemos agendar la visita por ahí.<div class="obj-tip">💡 "Mándame info" muchas veces es un "no" disfrazado. Úsalo para conseguir el número.</div></div>
+  </div>
+
+  <div class="obj-card" onclick="toggleObj(this)">
+    <div class="obj-header"><div class="obj-q">"¿Para qué me sirve eso del sistema de pedidos?"</div><div class="obj-arrow">›</div></div>
+    <div class="obj-body">Para que deje de depender de que su mesero no se equivoque y de papelitos perdidos. Usted ve en su celular lo que se vende en tiempo real — cuánto lleva la caja, qué bebidas van más. Sin comprar nada extra.<div class="obj-tip">💡 Siempre en términos de DINERO y tranquilidad, no de tecnología.</div></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ CAPTURA ════════════ -->
+<div class="section" id="s-captura">
+  <div class="section-title">5 · Formato de captura</div>
+  <div class="highlight">Llena uno por negocio. Al final del día mandas los datos para generar seguimientos.</div>
+
+  <div class="field-label">Visita #</div>
+  <input class="field-input" id="f-num" type="number" placeholder="01" min="1">
+
+  <div class="field-label">Nombre del negocio *</div>
+  <input class="field-input" id="f-nombre" type="text" placeholder="Ej: Café La Paloma">
+
+  <div class="field-label">Dirección / referencia</div>
+  <input class="field-input" id="f-dir" type="text" placeholder="Ej: Av. Juárez 245, frente al banco">
+
+  <div class="field-label">Colonia / Zona</div>
+  <input class="field-input" id="f-colonia" type="text" placeholder="Ej: Centro, Navarro...">
+
+  <div class="field-label">Nombre del dueño / encargado</div>
+  <input class="field-input" id="f-dueno" type="text" placeholder="Nombre">
+
+  <div class="field-label">Teléfono / WhatsApp</div>
+  <input class="field-input" id="f-tel" type="tel" placeholder="871 000 0000">
+
+  <div class="field-label">¿Dueño presente?</div>
+  <div class="radio-group" id="rg-dueno">
+    <div class="radio-btn" onclick="selectRadio('rg-dueno',this)">Sí</div>
+    <div class="radio-btn" onclick="selectRadio('rg-dueno',this)">No</div>
+  </div>
+
+  <div class="field-label">Empleados visibles</div>
+  <div class="radio-group" id="rg-emp">
+    <div class="radio-btn" onclick="selectRadio('rg-emp',this)">Solo el dueño</div>
+    <div class="radio-btn" onclick="selectRadio('rg-emp',this)">1-2</div>
+    <div class="radio-btn" onclick="selectRadio('rg-emp',this)">3-5</div>
+    <div class="radio-btn" onclick="selectRadio('rg-emp',this)">+5</div>
+  </div>
+
+  <div class="field-label">Problemas observados (puede ser varios)</div>
+  <div class="prob-tags" id="probTags">
+    <div class="prob-tag" onclick="this.classList.toggle('active')">☕ Pedidos en papel</div>
+    <div class="prob-tag" onclick="this.classList.toggle('active')">📦 Inventario manual</div>
+    <div class="prob-tag" onclick="this.classList.toggle('active')">💸 Sin control de gastos</div>
+    <div class="prob-tag" onclick="this.classList.toggle('active')">🧠 Todo en la cabeza</div>
+    <div class="prob-tag" onclick="this.classList.toggle('active')">📊 Sin datos de ventas</div>
+    <div class="prob-tag" onclick="this.classList.toggle('active')">📱 Sin presencia digital</div>
+    <div class="prob-tag" onclick="this.classList.toggle('active')">⚙️ Sin procesos definidos</div>
+  </div>
+
+  <div class="field-label">Nivel de interés</div>
+  <div class="interes-group" id="igInteres">
+    <div class="interes-btn frio" onclick="selectInteres(this)">🧊 Frío</div>
+    <div class="interes-btn tibio" onclick="selectInteres(this)">🌤 Tibio</div>
+    <div class="interes-btn caliente" onclick="selectInteres(this)">🔥 Caliente</div>
+    <div class="interes-btn agendo" onclick="selectInteres(this)">✅ Ya agendó</div>
+  </div>
+
+  <div class="field-label">Próximos pasos acordados</div>
+  <div class="pasos-group" id="pgPasos">
+    <div class="paso-btn" onclick="this.classList.toggle('active')">📇 Dejé tarjeta</div>
+    <div class="paso-btn" onclick="this.classList.toggle('active')">📱 Me dio número</div>
+    <div class="paso-btn" onclick="this.classList.toggle('active')">📅 Diagnóstico agendado</div>
+    <div class="paso-btn" onclick="this.classList.toggle('active')">💬 Seguimiento por WhatsApp</div>
+    <div class="paso-btn" onclick="this.classList.toggle('active')">🔄 Regreso en días</div>
+  </div>
+
+  <div class="field-label">Notas adicionales</div>
+  <textarea class="field-input" id="f-notas" placeholder="Actitud del dueño, objeción que puso, algo que viste, lo que sea..."></textarea>
+
+  <button class="btn-save" onclick="guardarVisita()">💾 Guardar visita</button>
+  <button class="btn-clear" onclick="limpiarForm()">✕ Limpiar formulario</button>
+  <div class="bottom-pad"></div>
+</div>
+
+<!-- ════════════════════════════════ TIPS ════════════ -->
+<div class="section" id="s-tips">
+  <div class="section-title">6 · Tips zona Centro / Av. Juárez</div>
+
+  <div class="card">
+    <div class="card-title">📍 Cómo moverse</div>
+    <div class="info-row"><div class="info-icon">🚗</div><div class="info-text"><strong>Estaciona en un punto central y camina</strong>Más negocios en menos tiempo y sin problema de estacionamiento.</div></div>
+    <div class="info-row"><div class="info-icon">☕</div><div class="info-text"><strong>Cafeterías del 2do cuadro abren desde 7:30</strong>Llega a las 8:30 — ya están establecidos y el dueño está ahí.</div></div>
+    <div class="info-row"><div class="info-icon">⏰</div><div class="info-text"><strong>Mejor horario para cafeterías: 8:30–10:30</strong>Antes del rush de mediodía. Después de las 11 ya están en plena operación.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🤝 Cultura lagunera</div>
+    <div class="info-row"><div class="info-icon">👋</div><div class="info-text"><strong>El lagunero valora la relación personal</strong>Preséntate con nombre, no solo con servicio. "Soy José" primero.</div></div>
+    <div class="info-row"><div class="info-icon">⚠️</div><div class="info-text"><strong>El "ahorita" en Torreón puede ser nunca</strong>Cuando digan "ahorita le llamo", consigue TÚ el número antes de irte.</div></div>
+    <div class="info-row"><div class="info-icon">🚫</div><div class="info-text"><strong>No uses palabras técnicas</strong>"Sistema", "automatización", "software" → cambia por "control", "orden", "dinero".</div></div>
+    <div class="info-row"><div class="info-icon">🍽️</div><div class="info-text"><strong>Si el dueño está comiendo o atendiendo, espera</strong>No interrumpas — ya perdiste la venta antes de empezar.</div></div>
+  </div>
+
+  <div class="card orange-left">
+    <div class="card-title">🎯 Recuerda</div>
+    <div class="card-body">Hoy <strong style="color:var(--white)">NO</strong> vienes a vender. Vienes a repartir valor gratuito y a conseguir contactos.<br><br>3 diagnósticos agendados = día exitoso<br>5 = día extraordinario<br>Cierras algo = ganaste la lotería 🎰</div>
+  </div>
+
+  <div class="bottom-pad"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ Visita guardada</div>
+
+<script>
+  // Tabs
+  function showTab(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('s-'+id).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  // Checklist
+  function toggleCheck(el) {
+    el.classList.toggle('checked');
+  }
+
+  // Radio
+  function selectRadio(groupId, el) {
+    document.querySelectorAll('#'+groupId+' .radio-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Interés
+  function selectInteres(el) {
+    document.querySelectorAll('#igInteres .interes-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Objeciones accordion
+  function toggleObj(card) {
+    const isOpen = card.classList.contains('open');
+    document.querySelectorAll('.obj-card').forEach(c => c.classList.remove('open'));
+    if (!isOpen) card.classList.add('open');
+  }
+
+  // Guardar visita
+  function guardarVisita() {
+    const nombre = document.getElementById('f-nombre').value.trim();
+    if (!nombre) { alert('El nombre del negocio es obligatorio'); return; }
+
+    const visita = {
+      num: document.getElementById('f-num').value || '—',
+      nombre,
+      dir: document.getElementById('f-dir').value || '—',
+      colonia: document.getElementById('f-colonia').value || '—',
+      dueno: document.getElementById('f-dueno').value || '—',
+      tel: document.getElementById('f-tel').value || '—',
+      dueno_presente: document.querySelector('#rg-dueno .active')?.textContent || '—',
+      empleados: document.querySelector('#rg-emp .active')?.textContent || '—',
+      problemas: Array.from(document.querySelectorAll('#probTags .active')).map(e=>e.textContent).join(', ') || '—',
+      interes: document.querySelector('#igInteres .active')?.textContent || '—',
+      pasos: Array.from(document.querySelectorAll('#pgPasos .active')).map(e=>e.textContent).join(', ') || '—',
+      notas: document.getElementById('f-notas').value || '—',
+      fecha: new Date().toLocaleDateString('es-MX')
+    };
+
+    // Guardar en localStorage como respaldo local
+    const visitas = JSON.parse(localStorage.getItem('nsr_visitas') || '[]');
+    visitas.push(visita);
+    localStorage.setItem('nsr_visitas', JSON.stringify(visitas));
+
+    // Generar resumen para copiar/mandar por WhatsApp
+    const resumen = `📋 VISITA #${visita.num} — ${visita.fecha}
+📍 ${visita.nombre} | ${visita.colonia}
+📌 ${visita.dir}
+👤 ${visita.dueno} | ${visita.tel}
+👥 Empleados: ${visita.empleados} | Dueño presente: ${visita.dueno_presente}
+🔍 Problemas: ${visita.problemas}
+🌡 Interés: ${visita.interes}
+✅ Pasos: ${visita.pasos}
+📝 ${visita.notas}`;
+
+    // Intentar copiar
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(resumen).catch(()=>{});
+    }
+
+    showToast('✅ Guardada — resumen copiado al clipboard');
+  }
+
+  function limpiarForm() {
+    if (!confirm('¿Limpiar el formulario?')) return;
+    ['f-num','f-nombre','f-dir','f-colonia','f-dueno','f-tel','f-notas'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.querySelectorAll('.radio-btn, .interes-btn, .paso-btn, .prob-tag').forEach(el => el.classList.remove('active'));
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+</script>
+</body>
+</html>
