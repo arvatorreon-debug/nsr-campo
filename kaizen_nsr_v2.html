@@ -505,6 +505,86 @@ input[type=range].sleep-sl::-webkit-slider-thumb{
 }
 .j-save-btn:hover{transform:scale(1.02);box-shadow:0 8px 32px rgba(59,108,248,0.40);}
 
+/* ── OBSIDIAN EXPORT PANEL ── */
+.obs-panel{
+  background:var(--surf);border:1px solid rgba(255,255,255,0.85);
+  border-radius:var(--r);padding:16px;margin-bottom:12px;
+  box-shadow:var(--sh-card);
+}
+.obs-section-lbl{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:var(--t4);letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:9px;display:flex;align-items:center;gap:6px;
+}
+.obs-section-lbl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(59,108,248,0.12),transparent);}
+
+/* Tag chips */
+.tags-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.tag-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:4px 10px;border-radius:20px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;
+  cursor:pointer;border:1px solid transparent;
+  transition:all 0.2s;user-select:none;
+}
+.tag-chip.suggested{
+  background:var(--a-dim);border-color:rgba(59,108,248,0.25);color:var(--a);
+}
+.tag-chip.manual{
+  background:rgba(255,255,255,0.6);border-color:rgba(59,108,248,0.15);color:var(--t3);
+}
+.tag-chip.on{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 2px 8px rgba(59,108,248,0.28);
+}
+.tag-chip.on .tag-x{opacity:1;}
+.tag-x{opacity:0;font-size:11px;transition:opacity 0.2s;margin-left:1px;}
+.tag-add-btn{
+  padding:4px 10px;border-radius:20px;
+  background:transparent;border:1px dashed rgba(59,108,248,0.25);
+  color:var(--t4);font-family:'JetBrains Mono',monospace;font-size:10px;
+  cursor:pointer;transition:all 0.2s;
+}
+.tag-add-btn:hover{border-color:var(--a);color:var(--a);}
+
+/* Backlinks */
+.backlinks-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+.bl-chip{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 10px;border-radius:var(--r-xs);
+  border:1px solid rgba(59,108,248,0.12);
+  background:rgba(255,255,255,0.5);
+  cursor:pointer;transition:all 0.2s;
+}
+.bl-chip:hover{border-color:rgba(59,108,248,0.28);}
+.bl-chip.on{
+  border-color:var(--a);background:var(--a-dim);
+  box-shadow:0 2px 8px rgba(59,108,248,0.18);
+}
+.bl-ico{font-size:14px;flex-shrink:0;}
+.bl-name{font-size:11px;font-weight:600;color:var(--t2);line-height:1.2;}
+.bl-cat{font-size:9px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.bl-chip.on .bl-name{color:var(--a);}
+
+/* Export button row */
+.j-btn-row{display:flex;gap:8px;margin-bottom:8px;}
+.j-export-btn{
+  flex:1;padding:13px;
+  background:transparent;
+  border:1.5px solid rgba(59,108,248,0.30);
+  border-radius:var(--r-sm);color:var(--a);
+  font-family:'Sora',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;
+  cursor:pointer;transition:all 0.3s;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.j-export-btn:hover{background:var(--a-dim);border-color:var(--a);box-shadow:var(--a-glow);}
+.j-export-btn:active{transform:scale(0.97);}
+/* Obsidian purple accent for export btn */
+.j-export-btn .obs-icon{font-size:16px;}
+
 /* Journal history */
 .j-entry{
   background:var(--surf);border:1px solid rgba(255,255,255,0.85);
@@ -977,9 +1057,49 @@ input[type=range].sleep-sl::-webkit-slider-thumb{
         </div>
         <div class="card">
           <div class="card-lbl">◉ ENTRADA LIBRE</div>
-          <textarea class="j-area" id="j-free" placeholder="Solo tú. Sin filtros. Escribe lo que sea — ideas, frustración, claridad, caos. Todo vale aquí 👁️"></textarea>
+          <textarea class="j-area" id="j-free" oninput="autoDetectTags()" placeholder="Solo tú. Sin filtros. Escribe lo que sea — ideas, frustración, claridad, caos. Todo vale aquí 👁️"></textarea>
         </div>
-        <button class="j-save-btn" onclick="saveJournal()">✦ GUARDAR ENTRADA</button>
+
+        <!-- ══ OBSIDIAN EXPORT PANEL ══ -->
+        <div class="obs-panel">
+
+          <!-- Tags -->
+          <div class="obs-section-lbl">◈ Tags · detectados + manuales</div>
+          <div class="tags-wrap" id="tags-wrap">
+            <!-- populated by JS -->
+          </div>
+          <div class="tags-wrap" style="margin-top:6px" id="tags-manual-wrap">
+            <!-- manual tag options -->
+          </div>
+
+          <div style="height:14px"></div>
+
+          <!-- Backlinks -->
+          <div class="obs-section-lbl">◆ Backlinks · selecciona los que apliquen</div>
+          <div class="backlinks-grid" id="backlinks-grid">
+            <!-- NSR Clientes -->
+            <div class="bl-chip" onclick="toggleBL(this,'Apolo Urban Kitchen')"><span class="bl-ico">☕</span><div><div class="bl-name">Apolo Urban Kitchen</div><div class="bl-cat">NSR · Cliente</div></div></div>
+            <div class="bl-chip" onclick="toggleBL(this,'Saturno Café')"><span class="bl-ico">☕</span><div><div class="bl-name">Saturno Café</div><div class="bl-cat">NSR · Prospecto</div></div></div>
+            <div class="bl-chip" onclick="toggleBL(this,'Biela Café')"><span class="bl-ico">☕</span><div><div class="bl-name">Biela Café</div><div class="bl-cat">NSR · En pausa</div></div></div>
+            <div class="bl-chip" onclick="toggleBL(this,'PsicoPocc')"><span class="bl-ico">🧠</span><div><div class="bl-name">PsicoPocc</div><div class="bl-cat">NSR · Entregado</div></div></div>
+            <div class="bl-chip" onclick="toggleBL(this,'Inktrovertida')"><span class="bl-ico">🖊️</span><div><div class="bl-name">Inktrovertida</div><div class="bl-cat">NSR · Demo listo</div></div></div>
+            <!-- Empleo -->
+            <div class="bl-chip" onclick="toggleBL(this,'ManpowerGroup')"><span class="bl-ico">💼</span><div><div class="bl-name">ManpowerGroup</div><div class="bl-cat">Empleo · Proceso</div></div></div>
+            <div class="bl-chip" onclick="toggleBL(this,'Grupo Modelo')"><span class="bl-ico">🏢</span><div><div class="bl-name">Grupo Modelo</div><div class="bl-cat">Empleo · Proceso</div></div></div>
+            <div class="bl-chip" onclick="toggleBL(this,'VentAcero')"><span class="bl-ico">🏗️</span><div><div class="bl-name">VentAcero</div><div class="bl-cat">Empleo · Proceso</div></div></div>
+            <!-- Proyectos -->
+            <div class="bl-chip" onclick="toggleBL(this,'NSR Negocio Sin Rodeos')"><span class="bl-ico">🚀</span><div><div class="bl-name">NSR</div><div class="bl-cat">Proyecto · Principal</div></div></div>
+            <div class="bl-chip" onclick="toggleBL(this,'DSCA INFOTEC')"><span class="bl-ico">📚</span><div><div class="bl-name">DSCA · INFOTEC</div><div class="bl-cat">Formación</div></div></div>
+            <div class="bl-chip" onclick="toggleBL(this,'Kaizen App')"><span class="bl-ico">⚡</span><div><div class="bl-name">Kaizen App</div><div class="bl-cat">Proyecto · PWA</div></div></div>
+            <div class="bl-chip" onclick="toggleBL(this,'Gumroad Plantillas')"><span class="bl-ico">📦</span><div><div class="bl-name">Gumroad</div><div class="bl-cat">Ingresos · Digital</div></div></div>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="j-btn-row">
+          <button class="j-save-btn" style="flex:1.4" onclick="saveJournal()">✦ GUARDAR</button>
+          <button class="j-export-btn" onclick="exportToObsidian()"><span class="obs-icon">🗂️</span> Exportar .md</button>
+        </div>
         <div style="height:8px"></div>
       </div>
       <div id="j-hist" style="display:none">
@@ -1378,11 +1498,183 @@ function switchJTab(tab,el){
 }
 function pickMood(btn,val){document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');S.mood=val;}
 function updateSleep(inp){const v=parseFloat(inp.value);S.sleep=v;document.getElementById('sleep-val').textContent=`${v}h`;inp.style.setProperty('--val',`${(v/12)*100}%`);}
+
+// ══════════════════════════════════════════
+//  TAG DETECTION ENGINE
+// ══════════════════════════════════════════
+const TAG_RULES = [
+  { tag:'#nsr',        keywords:['nsr','cliente','clientes','propuesta','consultoría','consultoria','cafetería','cafeteria','negocio','venta','ventas','pitch','prospecto','factura','cobro','cobrar'] },
+  { tag:'#empleo',     keywords:['empleo','trabajo','entrevista','curriculum','cv','modelo','manpower','ventacero','setramex','alianco','recruiter','proceso','puesto','cargo','supervisor'] },
+  { tag:'#salud',      keywords:['gym','gimnasio','ejercicio','correr','dormir','sueño','cansado','cansancio','salud','médico','doctor','dieta','agua','hidratación','energia','energía'] },
+  { tag:'#ideas',      keywords:['idea','ideas','proyecto','proyectos','construir','lanzar','startup','crear','innovar','oportunidad','concepto','plan','estrategia'] },
+  { tag:'#reflexión',  keywords:['estrés','estres','frustración','frustracion','ánimo','animo','motivación','motivacion','sentir','sentimiento','emociones','pensamientos','reflexión','reflexion','mente','mental'] },
+  { tag:'#finanzas',   keywords:['dinero','ingreso','ingresos','gasto','gastos','pagar','deuda','deudas','ahorro','ahorrar','presupuesto','flujo','caja','mxn','peso','pesos'] },
+  { tag:'#aprendizaje',keywords:['estudiar','estudio','curso','dsca','infotec','aprender','aprendizaje','módulo','modulo','certificado','clase','tarea','lectura'] },
+  { tag:'#tdah',       keywords:['tdah','adhd','concentración','concentracion','distracción','distraccion','foco','enfoque','procrastinación','procrastinacion','impulsivo','inatento','hiperactivo'] },
+  { tag:'#pwa',        keywords:['pwa','progressive web app','app web','webapps','html','css','javascript','apps script','appscript','github','deploy','kaizen','aplicación','aplicacion'] },
+];
+
+// All available tags for manual selection
+const ALL_TAGS = TAG_RULES.map(r=>r.tag).concat(['#personal','#metas','#diario','#gratitud','#habitos','#productividad']);
+
+// Current state for the export panel
+let activeTags = new Set();
+let activeBacklinks = new Set();
+
+function autoDetectTags() {
+  const text = [
+    document.getElementById('j-free').value,
+    document.getElementById('j-intent').value,
+    document.getElementById('j-wins').value,
+    document.getElementById('j-nsr').value,
+  ].join(' ').toLowerCase();
+
+  const detected = new Set();
+  TAG_RULES.forEach(rule => {
+    if (rule.keywords.some(kw => text.includes(kw))) detected.add(rule.tag);
+  });
+
+  // Add detected tags, keep any manually added ones
+  detected.forEach(t => activeTags.add(t));
+
+  renderTagsPanel(detected);
+}
+
+function renderTagsPanel(detected = new Set()) {
+  const wrap = document.getElementById('tags-wrap');
+  const manualWrap = document.getElementById('tags-manual-wrap');
+
+  // Detected / active chips
+  const allActive = [...activeTags];
+  wrap.innerHTML = allActive.length === 0
+    ? `<span style="font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace">Escribe en la entrada libre para detectar tags…</span>`
+    : allActive.map(tag => `
+        <div class="tag-chip on" onclick="removeTag('${tag}')">
+          ${tag} <span class="tag-x">✕</span>
+        </div>`).join('');
+
+  // Manual options (not already active)
+  const available = ALL_TAGS.filter(t => !activeTags.has(t));
+  manualWrap.innerHTML = available.map(tag => `
+    <div class="tag-chip manual" onclick="addTag('${tag}')">+ ${tag}</div>
+  `).join('');
+}
+
+function addTag(tag) {
+  activeTags.add(tag);
+  renderTagsPanel();
+}
+
+function removeTag(tag) {
+  activeTags.delete(tag);
+  renderTagsPanel();
+}
+
+function toggleBL(el, name) {
+  el.classList.toggle('on');
+  if (el.classList.contains('on')) activeBacklinks.add(name);
+  else activeBacklinks.delete(name);
+}
+
+function resetExportPanel() {
+  activeTags.clear();
+  activeBacklinks.clear();
+  document.querySelectorAll('.bl-chip').forEach(c => c.classList.remove('on'));
+  renderTagsPanel();
+}
+
+// ══════════════════════════════════════════
+//  OBSIDIAN EXPORT — genera .md y descarga
+// ══════════════════════════════════════════
+function exportToObsidian() {
+  const free   = document.getElementById('j-free').value.trim();
+  const intent = document.getElementById('j-intent').value.trim();
+  const wins   = document.getElementById('j-wins').value.trim();
+  const nsr    = document.getElementById('j-nsr').value.trim();
+
+  if (!free && !intent) { showToast('Escribe algo antes de exportar 😅'); return; }
+
+  const now    = new Date();
+  const dateISO= now.toISOString().split('T')[0]; // YYYY-MM-DD
+  const moodEmoji  = ['','😞','😕','😐','😊','🤩'][S.mood] || '😐';
+  const moodNames  = ['','pésimo','mal','regular','bien','increíble'];
+  const moodLabel  = moodNames[S.mood] || 'regular';
+
+  const tags   = [...activeTags];
+  const bls    = [...activeBacklinks];
+
+  // ── Frontmatter YAML ──
+  const tagsYaml   = tags.length  ? '\ntags:\n' + tags.map(t => `  - ${t.replace('#','')}`).join('\n') : '';
+  const linksYaml  = bls.length   ? '\nlinks:\n' + bls.map(b => `  - "[[${b}]]"`).join('\n') : '';
+
+  const frontmatter = `---
+date: ${dateISO}
+tipo: journal
+mood: ${S.mood} · ${moodEmoji} ${moodLabel}
+sueño: ${S.sleep}h
+xp_kaizen: ${S.xp}${tagsYaml}${linksYaml}
+---`;
+
+  // ── Cuerpo ──
+  const moodBar = '⬛'.repeat(S.mood) + '⬜'.repeat(5 - S.mood);
+
+  let body = `# 📓 Journal · ${dateISO}\n\n`;
+  body += `> ${moodEmoji} **Estado de ánimo:** ${moodLabel} ${moodBar}  \n`;
+  body += `> 😴 **Sueño:** ${S.sleep}h\n\n`;
+  body += `---\n\n`;
+
+  if (intent) body += `## 🎯 Intención del día\n${intent}\n\n`;
+  if (wins)   body += `## ✦ Victorias de ayer\n${wins}\n\n`;
+  if (nsr)    body += `## 🚀 Próximo paso NSR\n${nsr}\n\n`;
+  if (free)   body += `## 📝 Entrada libre\n${free}\n\n`;
+
+  // Backlinks section
+  if (bls.length) {
+    body += `---\n\n## 🔗 Contexto\n`;
+    body += bls.map(b => `- [[${b}]]`).join('\n');
+    body += '\n\n';
+  }
+
+  // Tags inline al final (estilo Obsidian)
+  if (tags.length) {
+    body += `---\n\n${tags.join(' ')}\n`;
+  }
+
+  // ── Filename sugerido ──
+  const filename = `${dateISO}-journal.md`;
+
+  // ── Descarga ──
+  const md = frontmatter + '\n\n' + body;
+  const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showToast(`🗂️ ${filename} descargado`);
+}
+
 function saveJournal(){
   const free=document.getElementById('j-free').value.trim();
   const intent=document.getElementById('j-intent').value.trim();
   if(!free&&!intent){showToast('Escribe algo primero 😅');return;}
-  const entry={date:new Date().toISOString(),dateStr:document.getElementById('j-date').textContent,mood:S.mood,sleep:S.sleep,intent,wins:document.getElementById('j-wins').value.trim(),nsr:document.getElementById('j-nsr').value.trim(),free,xp:S.xp};
+
+  // Run tag detection one last time before saving
+  autoDetectTags();
+
+  const entry={
+    date:new Date().toISOString(),
+    dateStr:document.getElementById('j-date').textContent,
+    mood:S.mood,sleep:S.sleep,
+    intent,
+    wins:document.getElementById('j-wins').value.trim(),
+    nsr:document.getElementById('j-nsr').value.trim(),
+    free,xp:S.xp,
+    tags:[...activeTags],
+    backlinks:[...activeBacklinks]
+  };
   S.journals.push(entry);
   S.moodHistory.push({date:new Date().toDateString(),mood:S.mood,sleep:S.sleep});
   S.streak++;if(S.streak>S.bestStreak)S.bestStreak=S.streak;
@@ -1394,6 +1686,7 @@ function saveJournal(){
   document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('sel'));
   document.querySelectorAll('.mood-btn')[2].classList.add('sel');S.mood=3;
   document.getElementById('s-journals').textContent=S.journals.length;
+  resetExportPanel();
   showToast('Journal guardado ◉ +20 XP');
   syncSheets('journal',entry);
 }
