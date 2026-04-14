@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="theme-color" content="#f0f4ff"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Kaizen_Obsidian"/>
+<link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Kaizen_Obsidian%22,%22short_name%22:%22K_Obsidian%22,%22start_url%22:%22./%22,%22display%22:%22standalone%22,%22background_color%22:%22%23f0f4ff%22,%22theme_color%22:%22%233b6cf8%22,%22scope%22:%22./%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20192%20192%27%3E%3Cdefs%3E%3ClinearGradient%20id=%27grad%27%20x1=%270%25%27%20y1=%270%25%27%20x2=%27100%25%27%20y2=%27100%25%27%3E%3Cstop%20offset=%270%25%27%20style=%27stop-color:%233b6cf8;stop-opacity:1%27%20/%3E%3Cstop%20offset=%27100%25%27%20style=%27stop-color:%237c5cfc;stop-opacity:1%27%20/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width=%27192%27%20height=%27192%27%20fill=%27url(%23grad)%27%20rx=%2744%27/%3E%3Cg%20fill=%27white%27%20font-family=%27monospace%27%20font-size=%27120%27%20font-weight=%27bold%27%3E%3Ctext%20x=%2750%25%27%20y=%2750%25%27%20text-anchor=%27middle%27%20dominant-baseline=%27central%27%3E{%22/text%3E%3C/g%3E%3C/svg%3E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%22},{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20512%20512%27%3E%3Cdefs%3E%3ClinearGradient%20id=%27grad2%27%20x1=%270%25%27%20y1=%270%25%27%20x2=%27100%25%27%20y2=%27100%25%27%3E%3Cstop%20offset=%270%25%27%20style=%27stop-color:%233b6cf8;stop-opacity:1%27%20/%3E%3Cstop%20offset=%27100%25%27%20style=%27stop-color:%237c5cfc;stop-opacity:1%27%20/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width=%27512%27%20height=%27512%27%20fill=%27url(%23grad2)%27%20rx=%27120%27/%3E%3Cg%20fill=%27white%27%20font-family=%27monospace%27%20font-size=%27320%27%20font-weight=%27bold%27%3E%3Ctext%20x=%2750%25%27%20y=%2750%25%27%20text-anchor=%27middle%27%20dominant-baseline=%27central%27%3E{%22/text%3E%3C/g%3E%3C/svg%3E%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%22}],%22screenshots%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20540%201170%27%3E%3Crect%20width=%27540%27%20height=%271170%27%20fill=%27%23f0f4ff%27/%3E%3Ctext%20x=%2750%25%27%20y=%2750%25%27%20text-anchor=%27middle%27%20dominant-baseline=%27central%27%20font-size=%27100%27%20fill=%27%233b6cf8%27%3EKaizen_Obsidian%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22540x1170%22,%22type%22:%22image/svg+xml%22,%22form_factor%22:%22narrow%22}]}"/>
+<title>Kaizen_Obsidian</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --a:       #3b6cf8;
+  --a-b:     #6189fb;
+  --a-dim:   rgba(59,108,248,0.10);
+  --a-mid:   rgba(59,108,248,0.18);
+  --a-glow:  0 8px 32px rgba(59,108,248,0.22);
+  --a-str:   0 0 0 3px rgba(59,108,248,0.12);
+  --s:       #7c5cfc;
+  --s-dim:   rgba(124,92,252,0.10);
+  --bg:      #f0f4ff;
+  --bg-2:    #e6ecfa;
+  --surf:    rgba(255,255,255,0.75);
+  --surf-2:  rgba(255,255,255,0.55);
+  --glass-nav: rgba(255,255,255,0.88);
+  --t1: #111827;
+  --t2: #374151;
+  --t3: #6b7280;
+  --t4: #9ca3af;
+  --green:   #10b981;
+  --green-d: rgba(16,185,129,0.10);
+  --amber:   #f59e0b;
+  --amber-d: rgba(245,158,11,0.10);
+  --red:     #ef4444;
+  --red-d:   rgba(239,68,68,0.10);
+  --teal:    #06b6d4;
+  --teal-d:  rgba(6,182,212,0.10);
+  --r:    20px;
+  --r-sm: 13px;
+  --r-xs: 9px;
+  --sh-card:  0 2px 12px rgba(17,24,39,0.05), 0 1px 3px rgba(17,24,39,0.04);
+  --sh-up:    0 8px 40px rgba(17,24,39,0.09), 0 2px 8px rgba(17,24,39,0.05);
+  --sh-float: 0 20px 60px rgba(59,108,248,0.20), 0 4px 16px rgba(17,24,39,0.08);
+  --nav-h: 70px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1)}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);transition:background 0.6s;}
+#mesh{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 8% 8%,  rgba(59,108,248,0.09) 0%,transparent 55%),radial-gradient(ellipse 60% 40% at 92% 85%, rgba(124,92,252,0.07) 0%,transparent 50%),radial-gradient(ellipse 45% 55% at 55% 50%, rgba(6,182,212,0.04)  0%,transparent 60%);transition:background 0.8s;}
+#dots{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(circle,rgba(59,108,248,0.07) 1px,transparent 1px);background-size:28px 28px;}
+#header{position:relative;z-index:10;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(255,255,255,0.75);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid rgba(255,255,255,0.9);box-shadow:0 1px 0 rgba(59,108,248,0.06),0 4px 20px rgba(17,24,39,0.04);}
+.h-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t4);letter-spacing:3px;text-transform:uppercase;margin-bottom:2px;}
+.h-name{font-family:'Sora',sans-serif;font-size:20px;font-weight:700;color:var(--t1);letter-spacing:-0.4px;}
+.h-name em{font-style:normal;background:linear-gradient(135deg,var(--a),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.h-right{display:flex;align-items:center;gap:10px;}
+#main{position:relative;z-index:5;flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 16px calc(var(--nav-h) + 18px);scroll-behavior:smooth;}
+#main::-webkit-scrollbar{width:2px;}
+#main::-webkit-scrollbar-thumb{background:var(--a);border-radius:2px;opacity:0.3;}
+.screen{display:none;}
+.screen.active{display:block;animation:screen-in 0.3s cubic-bezier(0.34,1.3,0.64,1);}
+@keyframes screen-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--surf);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.85);border-radius:var(--r);padding:16px;position:relative;overflow:hidden;box-shadow:var(--sh-card);}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.5),rgba(255,255,255,0));pointer-events:none;border-radius:var(--r);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border:none;border-radius:var(--r-sm);background:var(--a-dim);color:var(--a);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;border:1px solid rgba(59,108,248,0.20);}
+.btn:hover{background:var(--a-mid);border-color:var(--a);}
+.btn.primary{background:linear-gradient(135deg,var(--a),var(--a-b));color:#fff;border:none;}
+.btn.primary:hover{box-shadow:var(--a-glow);}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+input[type="text"],textarea{font-family:'DM Sans',sans-serif;background:var(--bg-2);border:1px solid rgba(59,108,248,0.15);border-radius:var(--r-sm);padding:10px 12px;color:var(--t1);font-size:13px;transition:all 0.2s;}
+input[type="text"]:focus,textarea:focus{outline:none;border-color:var(--a);background:rgba(255,255,255,0.9);}
+textarea{resize:vertical;min-height:80px;font-size:13px;line-height:1.5;}
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:15;height:var(--nav-h);background:var(--glass-nav);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(255,255,255,0.85);display:flex;justify-content:space-around;align-items:center;padding:8px 0;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;cursor:pointer;color:var(--t3);font-size:11px;transition:all 0.2s;flex:1;}
+.nav-item.active{color:var(--a);font-weight:600;}
+.nav-item-icon{font-size:20px;}
+.modal{display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;}
+.modal.active{display:flex;}
+.modal-content{background:var(--surf);border-radius:var(--r);padding:24px;max-width:90vw;max-height:80vh;overflow-y:auto;box-shadow:var(--sh-float);border:1px solid rgba(255,255,255,0.85);}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--t1);color:#fff;padding:12px 20px;border-radius:24px;font-size:13px;z-index:100;opacity:0;transition:opacity 0.3s;}
+.toast.show{opacity:1;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:640px){.grid-2{grid-template-columns:1fr;}}
+.stat-box{background:var(--a-dim);border:1px solid rgba(59,108,248,0.20);border-radius:var(--r-sm);padding:12px;text-align:center;}
+.stat-val{font-size:24px;font-weight:700;color:var(--a);font-family:'Sora',sans-serif;}
+.stat-label{font-size:11px;color:var(--t3);margin-top:4px;}
+.checklist-item{display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-2);border-radius:var(--r-sm);margin-bottom:8px;border:1px solid rgba(59,108,248,0.10);}
+.checklist-item input[type="checkbox"]{cursor:pointer;width:18px;height:18px;accent-color:var(--a);}
+.checklist-item label{flex:1;cursor:pointer;font-size:13px;color:var(--t2);}
+.checklist-item.done label{text-decoration:line-through;color:var(--t4);}
+.mood-chart{display:flex;align-items:flex-end;justify-content:space-around;height:120px;gap:8px;margin:16px 0;}
+.mood-bar{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;}
+.mood-bar-fill{width:100%;background:linear-gradient(180deg,var(--a),var(--a-b));border-radius:8px 8px 0 0;transition:all 0.3s;}
+.mood-bar-label{font-size:20px;}
+.mood-bar-count{font-size:11px;color:var(--t3);font-weight:500;}
+.dark .card{background:rgba(15,23,42,0.75);border-color:rgba(255,255,255,0.08);}
+.dark #header{background:rgba(15,23,42,0.75);border-color:rgba(255,255,255,0.08);}
+.dark .nav{background:rgba(15,23,42,0.88);border-color:rgba(255,255,255,0.08);}
+.dark #main{background:#06111d;}
+.dark #app{background:#06111d;}
+.dark input[type="text"],.dark textarea{background:rgba(30,41,59,0.8);border-color:rgba(59,108,248,0.20);color:#fff;}
+.dark #mesh{background:radial-gradient(ellipse 70% 50% at 8% 8%,  rgba(59,108,248,0.06) 0%,transparent 55%),radial-gradient(ellipse 60% 40% at 92% 85%, rgba(124,92,252,0.05) 0%,transparent 50%),radial-gradient(ellipse 45% 55% at 55% 50%, rgba(6,182,212,0.02)  0%,transparent 60%);}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="mesh"></div>
+  <div id="dots"></div>
+  <header id="header">
+    <div class="h-left">
+      <div class="h-sub">OBSIDIAN</div>
+      <div class="h-name">KAIZEN <em>SYNC</em></div>
+    </div>
+    <div class="h-right"></div>
+  </header>
+  <main id="main">
+    <!-- DASHBOARD SCREEN -->
+    <div id="screen-dashboard" class="screen active">
+      <div class="card" style="margin-bottom:16px;">
+        <div style="margin-bottom:16px;">
+          <div style="font-size:13px;color:var(--t3);margin-bottom:8px;">📤 Importar carpeta Obsidian</div>
+          <button class="btn primary" onclick="importObsidianFolder()" style="width:100%;">📁 Seleccionar carpeta</button>
+          <div id="folder-status" style="font-size:12px;color:var(--t3);margin-top:8px;">No configurado</div>
+        </div>
+      </div>
+
+      <!-- MOOD TRACKER -->
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;">😊 Mood Tracker (14 días)</div>
+        <div class="mood-chart" id="mood-chart">
+          <div style="text-align:center;color:var(--t3);padding:20px;width:100%;">Importa tu carpeta para ver datos</div>
+        </div>
+      </div>
+
+      <!-- NOTE STATS -->
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;">📝 Notas creadas</div>
+        <div class="grid-2">
+          <div class="stat-box">
+            <div class="stat-val" id="stat-journal">0</div>
+            <div class="stat-label">Journal</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-tdah">0</div>
+            <div class="stat-label">TDAH</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-ideas">0</div>
+            <div class="stat-label">Ideas</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-gen1">0</div>
+            <div class="stat-label">Gen1</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-gen2">0</div>
+            <div class="stat-label">Gen2</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-total">0</div>
+            <div class="stat-label">Total</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAREAS DEL DÍA -->
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;">✅ Tareas de hoy</div>
+        <div id="tasks-list"></div>
+        <button class="btn" onclick="addTaskField()" style="width:100%;margin-top:12px;">+ Añadir tarea</button>
+        <button class="btn primary" onclick="saveTasks()" style="width:100%;margin-top:8px;">Guardar cambios</button>
+      </div>
+    </div>
+
+    <!-- JOURNAL SCREEN -->
+    <div id="screen-journal" class="screen">
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;">◈ ESTADO DE ÁNIMO</div>
+        <div style="display:flex;justify-content:space-between;gap:8px;">
+          <button class="mood-btn" data-mood="😞" onclick="selectMood('😞')" style="flex:1;padding:12px;border:none;border-radius:var(--r-sm);background:var(--bg-2);cursor:pointer;font-size:24px;transition:all 0.2s;">😞</button>
+          <button class="mood-btn" data-mood="😕" onclick="selectMood('😕')" style="flex:1;padding:12px;border:none;border-radius:var(--r-sm);background:var(--bg-2);cursor:pointer;font-size:24px;transition:all 0.2s;">😕</button>
+          <button class="mood-btn" data-mood="😐" onclick="selectMood('😐')" style="flex:1;padding:12px;border:none;border-radius:var(--r-sm);background:var(--bg-2);cursor:pointer;font-size:24px;transition:all 0.2s;border:2px solid var(--a);">😐</button>
+          <button class="mood-btn" data-mood="😊" onclick="selectMood('😊')" style="flex:1;padding:12px;border:none;border-radius:var(--r-sm);background:var(--bg-2);cursor:pointer;font-size:24px;transition:all 0.2s;">😊</button>
+          <button class="mood-btn" data-mood="🤩" onclick="selectMood('🤩')" style="flex:1;padding:12px;border:none;border-radius:var(--r-sm);background:var(--bg-2);cursor:pointer;font-size:24px;transition:all 0.2s;">🤩</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;">◉ SUEÑO</div>
+        <label style="display:block;font-size:12px;color:var(--t3);margin-bottom:6px;">Horas anoche:</label>
+        <input type="range" id="journal-sleep" min="0" max="12" step="0.5" value="7.5" style="width:100%;cursor:pointer;accent-color:var(--a);" onchange="updateSleepDisplay()"/>
+        <div style="text-align:center;font-size:18px;color:var(--a);font-weight:600;margin-top:8px;"><span id="sleep-display">7.5h</span></div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;">◆ REFLEXIÓN</div>
+        
+        <label style="display:block;font-size:12px;color:var(--s);font-weight:600;margin-bottom:8px;">◈ INTENCIÓN PRINCIPAL</label>
+        <textarea id="journal-intention" placeholder="¿Qué haría este día valioso?" style="background:rgba(124,92,252,0.08);border-color:rgba(124,92,252,0.20);min-height:60px;"></textarea>
+
+        <label style="display:block;font-size:12px;color:var(--s);font-weight:600;margin-top:12px;margin-bottom:8px;">◆ 3 VICTORIAS DE AYER</label>
+        <textarea id="journal-victories" placeholder="1.\n2.\n3." style="background:rgba(124,92,252,0.08);border-color:rgba(124,92,252,0.20);min-height:80px;"></textarea>
+
+        <label style="display:block;font-size:12px;color:var(--s);font-weight:600;margin-top:12px;margin-bottom:8px;">🚀 PRÓXIMO PASO NSR</label>
+        <textarea id="journal-next-nsr" placeholder="Una acción concreta esta semana..." style="background:rgba(124,92,252,0.08);border-color:rgba(124,92,252,0.20);min-height:60px;"></textarea>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;">◉ ENTRADA LIBRE</div>
+        <textarea id="journal-free" placeholder="Solo tú. Sin filtros. Escribe lo que sea — ideas, frustración, claridad, caos. Todo vale aquí 👁️" style="min-height:100px;"></textarea>
+      </div>
+
+      <div class="card">
+        <div style="font-size:12px;color:var(--t3);margin-bottom:12px;">Se guardará como: YYYY-MM-DD.md</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn primary" onclick="downloadNote('journal')" style="flex:1;">📥 Descargar .md</button>
+          <button class="btn" onclick="clearNoteContent('journal')" style="flex:1;">🗑️ Limpiar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TDAH SCREEN -->
+    <div id="screen-tdah" class="screen">
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;">⚡ TDAH / Síntomas</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:12px;">Seguimiento: síntomas, medicamentos, links</div>
+        
+        <label style="display:block;font-size:12px;color:var(--t3);margin-bottom:6px;">Contenido:</label>
+        <textarea id="tdah-content" placeholder="Síntoma observado, medicamento tomado, link útil..."></textarea>
+
+        <label style="display:block;font-size:12px;color:var(--t3);margin-top:12px;margin-bottom:6px;">Etiquetas (opcional):</label>
+        <input type="text" id="tdah-tags" placeholder="#síntoma #medicamento #artículo #seguimiento"/>
+
+        <div style="font-size:11px;color:var(--t4);margin-top:8px;">Se guardará como: TDAH_YYYY-MM-DD_HHMMSS.md</div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn primary" onclick="downloadNote('tdah')" style="flex:1;">📥 Descargar .md</button>
+          <button class="btn" onclick="clearNoteContent('tdah')" style="flex:1;">🗑️ Limpiar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- IDEAS SCREEN -->
+    <div id="screen-ideas" class="screen">
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;">💡 Ideas</div>
+        
+        <label style="display:block;font-size:12px;color:var(--t3);margin-bottom:6px;">Tipo:</label>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <select id="idea-type" style="flex:1;background:var(--bg-2);border:1px solid rgba(59,108,248,0.15);border-radius:var(--r-sm);padding:8px;color:var(--t1);font-size:13px;">
+            <option value="producto">Producto</option>
+            <option value="servicio">Servicio</option>
+            <option value="pwa">PWA</option>
+            <option value="contenido">Contenido</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+
+        <label style="display:block;font-size:12px;color:var(--t3);margin-bottom:6px;">Título:</label>
+        <input type="text" id="idea-title" placeholder="Título de la idea"/>
+
+        <label style="display:block;font-size:12px;color:var(--t3);margin-top:12px;margin-bottom:6px;">Descripción:</label>
+        <textarea id="idea-content" placeholder="Describe tu idea..."></textarea>
+
+        <label style="display:block;font-size:12px;color:var(--t3);margin-top:12px;margin-bottom:8px;">Potencial:</label>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;">
+            <input type="radio" name="idea-potential" value="bajo"/> Bajo
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;">
+            <input type="radio" name="idea-potential" value="medio"/> Medio
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;">
+            <input type="radio" name="idea-potential" value="alto" checked/> Alto
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;">
+            <input type="radio" name="idea-potential" value="patente"/> Patente
+          </label>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn primary" onclick="downloadNote('ideas')" style="flex:1;">📥 Descargar .md</button>
+          <button class="btn" onclick="clearNoteContent('ideas')" style="flex:1;">🗑️ Limpiar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GEN1 SCREEN -->
+    <div id="screen-gen1" class="screen">
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;">📝 Genérica 1</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:12px;">Espacio para lo que necesites</div>
+        
+        <label style="display:block;font-size:12px;color:var(--t3);margin-bottom:6px;">Contenido:</label>
+        <textarea id="gen1-content" placeholder="Escribe aquí..."></textarea>
+
+        <label style="display:block;font-size:12px;color:var(--t3);margin-top:12px;margin-bottom:6px;">Etiquetas (opcional):</label>
+        <input type="text" id="gen1-tags" placeholder="#tag1 #tag2"/>
+
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn primary" onclick="downloadNote('gen1')" style="flex:1;">📥 Descargar .md</button>
+          <button class="btn" onclick="clearNoteContent('gen1')" style="flex:1;">🗑️ Limpiar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GEN2 SCREEN -->
+    <div id="screen-gen2" class="screen">
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;">📝 Genérica 2</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:12px;">Espacio para lo que necesites</div>
+        
+        <label style="display:block;font-size:12px;color:var(--t3);margin-bottom:6px;">Contenido:</label>
+        <textarea id="gen2-content" placeholder="Escribe aquí..."></textarea>
+
+        <label style="display:block;font-size:12px;color:var(--t3);margin-top:12px;margin-bottom:6px;">Etiquetas (opcional):</label>
+        <input type="text" id="gen2-tags" placeholder="#tag1 #tag2"/>
+
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn primary" onclick="downloadNote('gen2')" style="flex:1;">📥 Descargar .md</button>
+          <button class="btn" onclick="clearNoteContent('gen2')" style="flex:1;">🗑️ Limpiar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-item active" onclick="switchScreen('dashboard')"><div class="nav-item-icon">📊</div><div>Dashboard</div></div>
+    <div class="nav-item" onclick="switchScreen('journal')"><div class="nav-item-icon">📅</div><div>Journal</div></div>
+    <div class="nav-item" onclick="switchScreen('tdah')"><div class="nav-item-icon">⚡</div><div>TDAH</div></div>
+    <div class="nav-item" onclick="switchScreen('ideas')"><div class="nav-item-icon">💡</div><div>Ideas</div></div>
+    <div class="nav-item" onclick="switchScreen('gen1')"><div class="nav-item-icon">📝</div><div>Gen1</div></div>
+    <div class="nav-item" onclick="switchScreen('gen2')"><div class="nav-item-icon">📝</div><div>Gen2</div></div>
+  </nav>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const S={obsidianFolder:null,tasks:[],moodData:[],noteCounts:{journal:0,tdah:0,ideas:0,gen1:0,gen2:0}};
+
+function switchScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(`screen-${name}`).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  event.target.closest('.nav-item').classList.add('active');
+}
+
+function selectMood(mood){
+  document.querySelectorAll('.mood-btn').forEach(b=>b.style.border='none');
+  document.querySelector(`[data-mood="${mood}"]`).style.border='2px solid var(--a)';
+}
+
+function updateSleepDisplay(){
+  const val=document.getElementById('journal-sleep').value;
+  document.getElementById('sleep-display').textContent=val+'h';
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+async function importObsidianFolder(){
+  try{
+    const handle=await window.showDirectoryPicker({mode:'read'});
+    S.obsidianFolder=handle;
+    document.getElementById('folder-status').textContent=`✓ Carpeta importada`;
+    showToast('✓ Carpeta Obsidian importada');
+    await analyzeObsidianFolder();
+  }catch(e){
+    if(e.name!=='AbortError')showToast('Error al importar carpeta');
+  }
+}
+
+async function analyzeObsidianFolder(){
+  if(!S.obsidianFolder)return;
+  try{
+    S.moodData=[];
+    S.noteCounts={journal:0,tdah:0,ideas:0,gen1:0,gen2:0};
+    
+    for await(const[name,handle]of S.obsidianFolder.entries()){
+      if(handle.kind==='file'&&name.endsWith('.md')){
+        const file=await handle.getFile();
+        const content=await file.text();
+        
+        // Contar por tipo
+        if(name.match(/^\d{4}-\d{2}-\d{2}\.md$/))S.noteCounts.journal++;
+        else if(name.startsWith('TDAH_'))S.noteCounts.tdah++;
+        else if(name.startsWith('IDEA_'))S.noteCounts.ideas++;
+        else if(name.startsWith('GEN1_'))S.noteCounts.gen1++;
+        else if(name.startsWith('GEN2_'))S.noteCounts.gen2++;
+        
+        // Extraer mood (solo de Journal)
+        const moodMatch=content.match(/[😞😕😐😊🤩]/g);
+        if(moodMatch&&name.match(/^\d{4}-\d{2}-\d{2}\.md$/)){
+          const mood=moodMatch[0];
+          S.moodData.push(mood);
+        }
+      }else if(handle.kind==='directory'&&name.match(/^\d{2}_/)){
+        // Analizar subcarpetas como /05_DAILY_NOTES/
+        for await(const[subname,subhandle]of handle.entries()){
+          if(subhandle.kind==='file'&&subname.endsWith('.md')){
+            const file=await subhandle.getFile();
+            const content=await file.text();
+            
+            if(name==='05_DAILY_NOTES'&&subname.match(/^\d{4}-\d{2}-\d{2}\.md$/))S.noteCounts.journal++;
+            else if(name==='00_INBOX'&&subname.startsWith('TDAH_'))S.noteCounts.tdah++;
+            
+            const moodMatch=content.match(/[😞😕😐😊🤩]/g);
+            if(moodMatch&&name==='05_DAILY_NOTES'&&subname.match(/^\d{4}-\d{2}-\d{2}\.md$/)){
+              S.moodData.push(moodMatch[0]);
+            }
+          }
+        }
+      }
+    }
+    
+    S.noteCounts.total=Object.values(S.noteCounts).reduce((a,b)=>a+b,0);
+    updateDashboard();
+  }catch(e){
+    console.error(e);
+  }
+}
+
+function updateDashboard(){
+  document.getElementById('stat-journal').textContent=S.noteCounts.journal;
+  document.getElementById('stat-tdah').textContent=S.noteCounts.tdah;
+  document.getElementById('stat-ideas').textContent=S.noteCounts.ideas;
+  document.getElementById('stat-gen1').textContent=S.noteCounts.gen1;
+  document.getElementById('stat-gen2').textContent=S.noteCounts.gen2;
+  document.getElementById('stat-total').textContent=S.noteCounts.journal+S.noteCounts.tdah+S.noteCounts.ideas+S.noteCounts.gen1+S.noteCounts.gen2;
+  
+  renderMoodChart();
+  loadTasks();
+}
+
+function renderMoodChart(){
+  const moodEmojis=['😞','😕','😐','😊','🤩'];
+  const last14=S.moodData.slice(-14);
+  const counts={};
+  moodEmojis.forEach(m=>counts[m]=0);
+  last14.forEach(m=>counts[m]=(counts[m]||0)+1);
+  
+  let html='';
+  moodEmojis.forEach(emoji=>{
+    const h=Math.max(counts[emoji]*15,20);
+    html+=`<div class="mood-bar"><div class="mood-bar-fill" style="height:${h}px;"></div><div class="mood-bar-label">${emoji}</div><div class="mood-bar-count">${counts[emoji]}</div></div>`;
+  });
+  document.getElementById('mood-chart').innerHTML=html;
+}
+
+function loadTasks(){
+  const stored=localStorage.getItem('kz-tasks');
+  S.tasks=stored?JSON.parse(stored):[{text:'Seguimiento Apolo Urban Kitchen',done:false},{text:'Publicar contenido @negociosinrodeos',done:false},{text:'Revisar proceso ManpowerGroup',done:false},{text:'Estudiar módulo DSCA',done:false}];
+  renderTasks();
+}
+
+function renderTasks(){
+  const html=S.tasks.map((t,i)=>`<div class="checklist-item ${t.done?'done':''}"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${i})"><label>${t.text}</label></div>`).join('');
+  document.getElementById('tasks-list').innerHTML=html;
+}
+
+function toggleTask(i){
+  S.tasks[i].done=!S.tasks[i].done;
+  renderTasks();
+}
+
+function addTaskField(){
+  const text=prompt('Nueva tarea:');
+  if(text){S.tasks.push({text,done:false});renderTasks();}
+}
+
+function saveTasks(){
+  localStorage.setItem('kz-tasks',JSON.stringify(S.tasks));
+  showToast('✓ Tareas guardadas');
+}
+
+function getNowFormatted(){
+  const now=new Date();
+  return now.toISOString().split('T')[0];
+}
+
+function getNowWithTime(){
+  const now=new Date();
+  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+}
+
+async function downloadNote(type){
+  let filename,content;
+  
+  if(type==='journal'){
+    filename=`${getNowFormatted()}.md`;
+    const mood=document.querySelector('.mood-btn[style*="border: 2px solid"]')?.getAttribute('data-mood')||'😐';
+    const sleep=document.getElementById('journal-sleep').value||'0';
+    const intention=document.getElementById('journal-intention').value.trim()||'';
+    const victories=document.getElementById('journal-victories').value.trim()||'';
+    const nextNsr=document.getElementById('journal-next-nsr').value.trim()||'';
+    const freeEntry=document.getElementById('journal-free').value.trim()||'';
+    
+    content=`# ◈ ${filename.split('.')[0]}\n\n**BUENOS DÍAS**\n\n## ◈ ESTADO DE ÁNIMO\n${mood}\n\n## ◉ SUEÑO\nHoras anoche: **${sleep}h**\n\n## ◆ REFLEXIÓN\n### ◈ INTENCIÓN PRINCIPAL\n${intention}\n\n### ◆ 3 VICTORIAS DE AYER\n${victories}\n\n### 🚀 PRÓXIMO PASO NSR\n${nextNsr}\n\n## ◉ ENTRADA LIBRE\n${freeEntry}\n\n---\n*Entrada creada en Kaizen Obsidian*`;
+  }else if(type==='tdah'){
+    filename=`TDAH_${getNowWithTime()}.md`;
+    const text=document.getElementById('tdah-content').value.trim();
+    const tags=document.getElementById('tdah-tags').value.trim();
+    content=`# ⚡ TDAH — Seguimiento\n**Timestamp:** ${new Date().toLocaleString()}\n\n${text}\n\n${tags?`Tags: ${tags}\n`:''}\n---\n*Creado en Kaizen Obsidian*`;
+  }else if(type==='ideas'){
+    const title=document.getElementById('idea-title').value.trim();
+    if(!title){showToast('⚠️ Ingresa un título');return;}
+    filename=`IDEA_${title.replace(/\s+/g,'_')}.md`;
+    const typeVal=document.getElementById('idea-type').value;
+    const desc=document.getElementById('idea-content').value.trim();
+    const potential=document.querySelector('input[name="idea-potential"]:checked').value;
+    content=`# 💡 ${typeVal.toUpperCase()} — ${title}\n\n**Creado:** ${new Date().toLocaleString()}\n**Potencial:** ${potential}\n**Tipo:** ${typeVal}\n\n## Descripción\n${desc}\n\n## Próximos pasos\n- [ ] Investigar\n- [ ] Validar\n\n---\n*Idea creada en Kaizen Obsidian*`;
+  }else if(type==='gen1'){
+    filename=`GEN1_${getNowWithTime()}.md`;
+    const text=document.getElementById('gen1-content').value.trim();
+    const tags=document.getElementById('gen1-tags').value.trim();
+    content=`# Gen1\n**Timestamp:** ${new Date().toLocaleString()}\n\n${text}\n\n${tags?`Tags: ${tags}\n`:''}\n---\n*Creado en Kaizen Obsidian*`;
+  }else if(type==='gen2'){
+    filename=`GEN2_${getNowWithTime()}.md`;
+    const text=document.getElementById('gen2-content').value.trim();
+    const tags=document.getElementById('gen2-tags').value.trim();
+    content=`# Gen2\n**Timestamp:** ${new Date().toLocaleString()}\n\n${text}\n\n${tags?`Tags: ${tags}\n`:''}\n---\n*Creado en Kaizen Obsidian*`;
+  }
+  
+  try{
+    const handle=await window.showSaveFilePicker({suggestedName:filename,types:[{description:'Markdown',accept:{'text/markdown':['.md']}}]});
+    const writable=await handle.createWritable();
+    await writable.write(content);
+    await writable.close();
+    showToast(`✓ Guardado: ${filename}`);
+    clearNoteContent(type);
+  }catch(e){
+    if(e.name!=='AbortError')showToast('Error al descargar');
+  }
+}
+
+function clearNoteContent(type){
+  if(type==='journal'){
+    document.getElementById('journal-intention').value='';
+    document.getElementById('journal-victories').value='';
+    document.getElementById('journal-next-nsr').value='';
+    document.getElementById('journal-free').value='';
+    document.getElementById('journal-sleep').value='7.5';
+    updateSleepDisplay();
+    selectMood('😐');
+  }else if(type==='tdah'){document.getElementById('tdah-content').value='';document.getElementById('tdah-tags').value='';}
+  else if(type==='ideas'){document.getElementById('idea-title').value='';document.getElementById('idea-content').value='';}
+  else if(type==='gen1'){document.getElementById('gen1-content').value='';document.getElementById('gen1-tags').value='';}
+  else if(type==='gen2'){document.getElementById('gen2-content').value='';document.getElementById('gen2-tags').value='';}
+}
+
+loadTasks();
+
+// ══════════════════════════════════════════
+//  PWA — Service Worker mejorado
+// ══════════════════════════════════════════
+if('serviceWorker'in navigator){
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([`
+    const CACHE_NAME='kz-obsidian-v2.1';
+    const ASSETS_TO_CACHE=['./', './index.html'];
+    
+    self.addEventListener('install',event=>{
+      event.waitUntil(
+        caches.open(CACHE_NAME).then(cache=>{
+          return cache.addAll(ASSETS_TO_CACHE).catch(()=>{});
+        }).catch(()=>{})
+      );
+      self.skipWaiting();
+    });
+    
+    self.addEventListener('activate',event=>{
+      event.waitUntil(
+        caches.keys().then(cacheNames=>{
+          return Promise.all(
+            cacheNames.map(cacheName=>{
+              if(cacheName!==CACHE_NAME){
+                return caches.delete(cacheName);
+              }
+            })
+          );
+        })
+      );
+      self.clients.claim();
+    });
+    
+    self.addEventListener('fetch',event=>{
+      if(event.request.method!=='GET'){return;}
+      event.respondWith(
+        caches.match(event.request).then(response=>{
+          return response||fetch(event.request).then(fetchResponse=>{
+            if(!fetchResponse||fetchResponse.status!==200){
+              return fetchResponse;
+            }
+            const responseToCache=fetchResponse.clone();
+            caches.open(CACHE_NAME).then(cache=>{
+              cache.put(event.request,responseToCache);
+            });
+            return fetchResponse;
+          }).catch(()=>{
+            return caches.match('./');
+          });
+        })
+      );
+    });
+  `],{type:'application/javascript'}))).catch(()=>{});
+}
+
+console.log('%c🧠 Kaizen_Obsidian v2.1','color:#3b6cf8;font-size:14px;font-weight:bold');
+</script>
+</body>
+</html>
