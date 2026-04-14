@@ -499,12 +499,12 @@ async function downloadNote(type){
     const nextNsr=document.getElementById('journal-next-nsr').value.trim()||'';
     const freeEntry=document.getElementById('journal-free').value.trim()||'';
     
-    content=`# ◈ ${filename.split('.')[0]}\n\n**BUENOS DÍAS**\n\n## ◈ ESTADO DE ÁNIMO\n${mood}\n\n## ◉ SUEÑO\nHoras anoche: **${sleep}h**\n\n## ◆ REFLEXIÓN\n### ◈ INTENCIÓN PRINCIPAL\n${intention}\n\n### ◆ 3 VICTORIAS DE AYER\n${victories}\n\n### 🚀 PRÓXIMO PASO NSR\n${nextNsr}\n\n## ◉ ENTRADA LIBRE\n${freeEntry}\n\n---\n*Entrada creada en Kaizen Obsidian*`;
+    content=`# ◈ ${filename.split('.')[0]}\n\n**BUENOS DÍAS**\n\n## ◈ ESTADO DE ÁNIMO\n${mood}\n\n## ◉ SUEÑO\nHoras anoche: **${sleep}h**\n\n## ◆ REFLEXIÓN\n### ◈ INTENCIÓN PRINCIPAL\n${intention}\n\n### ◆ 3 VICTORIAS DE AYER\n${victories}\n\n### 🚀 PRÓXIMO PASO NSR\n${nextNsr}\n\n## ◉ ENTRADA LIBRE\n${freeEntry}\n\n---\n*Entrada creada en Kaizen_Obsidian*`;
   }else if(type==='tdah'){
     filename=`TDAH_${getNowWithTime()}.md`;
     const text=document.getElementById('tdah-content').value.trim();
     const tags=document.getElementById('tdah-tags').value.trim();
-    content=`# ⚡ TDAH — Seguimiento\n**Timestamp:** ${new Date().toLocaleString()}\n\n${text}\n\n${tags?`Tags: ${tags}\n`:''}\n---\n*Creado en Kaizen Obsidian*`;
+    content=`# ⚡ TDAH — Seguimiento\n**Timestamp:** ${new Date().toLocaleString()}\n\n${text}\n\n${tags?`Tags: ${tags}\n`:''}\n---\n*Creado en Kaizen_Obsidian*`;
   }else if(type==='ideas'){
     const title=document.getElementById('idea-title').value.trim();
     if(!title){showToast('⚠️ Ingresa un título');return;}
@@ -512,29 +512,43 @@ async function downloadNote(type){
     const typeVal=document.getElementById('idea-type').value;
     const desc=document.getElementById('idea-content').value.trim();
     const potential=document.querySelector('input[name="idea-potential"]:checked').value;
-    content=`# 💡 ${typeVal.toUpperCase()} — ${title}\n\n**Creado:** ${new Date().toLocaleString()}\n**Potencial:** ${potential}\n**Tipo:** ${typeVal}\n\n## Descripción\n${desc}\n\n## Próximos pasos\n- [ ] Investigar\n- [ ] Validar\n\n---\n*Idea creada en Kaizen Obsidian*`;
+    content=`# 💡 ${typeVal.toUpperCase()} — ${title}\n\n**Creado:** ${new Date().toLocaleString()}\n**Potencial:** ${potential}\n**Tipo:** ${typeVal}\n\n## Descripción\n${desc}\n\n## Próximos pasos\n- [ ] Investigar\n- [ ] Validar\n\n---\n*Idea creada en Kaizen_Obsidian*`;
   }else if(type==='gen1'){
     filename=`GEN1_${getNowWithTime()}.md`;
     const text=document.getElementById('gen1-content').value.trim();
     const tags=document.getElementById('gen1-tags').value.trim();
-    content=`# Gen1\n**Timestamp:** ${new Date().toLocaleString()}\n\n${text}\n\n${tags?`Tags: ${tags}\n`:''}\n---\n*Creado en Kaizen Obsidian*`;
+    content=`# Gen1\n**Timestamp:** ${new Date().toLocaleString()}\n\n${text}\n\n${tags?`Tags: ${tags}\n`:''}\n---\n*Creado en Kaizen_Obsidian*`;
   }else if(type==='gen2'){
     filename=`GEN2_${getNowWithTime()}.md`;
     const text=document.getElementById('gen2-content').value.trim();
     const tags=document.getElementById('gen2-tags').value.trim();
-    content=`# Gen2\n**Timestamp:** ${new Date().toLocaleString()}\n\n${text}\n\n${tags?`Tags: ${tags}\n`:''}\n---\n*Creado en Kaizen Obsidian*`;
+    content=`# Gen2\n**Timestamp:** ${new Date().toLocaleString()}\n\n${text}\n\n${tags?`Tags: ${tags}\n`:''}\n---\n*Creado en Kaizen_Obsidian*`;
   }
   
   try{
-    const handle=await window.showSaveFilePicker({suggestedName:filename,types:[{description:'Markdown',accept:{'text/markdown':['.md']}}]});
-    const writable=await handle.createWritable();
-    await writable.write(content);
-    await writable.close();
-    showToast(`✓ Guardado: ${filename}`);
-    clearNoteContent(type);
+    if(window.showSaveFilePicker){
+      const handle=await window.showSaveFilePicker({suggestedName:filename,types:[{description:'Markdown',accept:{'text/markdown':['.md']}}]});
+      const writable=await handle.createWritable();
+      await writable.write(content);
+      await writable.close();
+      showToast(`✓ Guardado: ${filename}`);
+    }else{
+      throw new Error('showSaveFilePicker no disponible');
+    }
   }catch(e){
-    if(e.name!=='AbortError')showToast('Error al descargar');
+    // Fallback: descarga tradicional
+    const blob=new Blob([content],{type:'text/markdown'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`✓ Descargado: ${filename}`);
   }
+  clearNoteContent(type);
 }
 
 function clearNoteContent(type){
