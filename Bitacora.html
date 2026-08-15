@@ -447,12 +447,12 @@
     <span class="chip">AlSuper</span>
     <span class="chip" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);">Piso</span>
   </div>
-  <h1 id="app-title">Bitácora de Piso</h1>
+  <h1 id="app-title">Bitácora de Pickup</h1>
   <p id="app-sub">Visitas de tienda · checklist · exporta directo a Markdown</p>
-  <span class="badge-offline"><span class="dot"></span> Funciona sin internet — guarda todo en este dispositivo</span>
+  <span class="badge-offline"><span class="dot"></span> Funciona Offline — guarda todo en este dispositivo</span>
 
   <div class="mode-switch">
-    <button class="mode-btn active" data-mode="bitacora">🏬 Bitácora de Piso</button>
+    <button class="mode-btn active" data-mode="bitacora">🏬 Bitácora de PickUp</button>
     <button class="mode-btn" data-mode="viaticos">🧳 Viáticos de Viaje</button>
   </div>
 
@@ -707,12 +707,12 @@ const DEFAULT_TEMPLATE = [
 /* ---- Catálogo de sucursales (semilla por región) ---- */
 const LS_SUCURSALES_EXTRA = "as_sucursales_extra_v1";
 const SUCURSALES_SEED = [
-  // Comarca Lagunera (Coahuila / Durango)
+  // Región Laguna (Coahuila / Durango)
   "Vasconcelos (Torreón)", "Campesino (Torreón)", "Fresno (Torreón)", "Triana (Torreón)",
   "Senderos (Torreón)", "Gómez Palacio - Hamburgo", "Gómez Palacio - Centro", "Lerdo",
   // Región Saltillo
   "Saltillo - Sucursal 1", "Saltillo - Sucursal 2", "Saltillo - Sucursal 3",
-  // Región Durango Capital
+  // Región Durango 
   "Durango - Sucursal 1", "Durango - Sucursal 2", "Durango - Sucursal 3",
   // Región Zacatecas
   "Zacatecas - Sucursal 1", "Zacatecas - Sucursal 2"
@@ -916,7 +916,7 @@ document.getElementById("btn-add-cat").addEventListener("click", ()=>{
 document.getElementById("btn-guardar").addEventListener("click", ()=>{
   const tienda = document.getElementById("f-tienda").value.trim();
   if(!tienda){
-    toast("Falta el nombre de la tienda 🙄");
+    toast("Falta el nombre de la tienda, ¿Sí le sabes? 🙄");
     document.getElementById("f-tienda").focus();
     return;
   }
@@ -940,7 +940,7 @@ document.getElementById("btn-guardar").addEventListener("click", ()=>{
   const md = generateMarkdown(visit);
   downloadFile(filenameFor(visit), md);
 
-  toast("Visita guardada y descargada ✅", true);
+  toast("Visita guardada y descargada 😎✅", true);
   initNewVisitForm();
 });
 
@@ -994,7 +994,7 @@ function generateMarkdown(v){
     md += `## 📌 Observaciones generales / pendientes\n${v.notasFinales}\n\n`;
   }
 
-  md += `---\n_Generado con Bitácora de Piso — AlSuper · ${new Date(v.creado).toLocaleString("es-MX")}_\n`;
+  md += `---\n_Generado con Bitácora AlSuper José Rojas· ${new Date(v.creado).toLocaleString("es-MX")}_\n`;
   return md;
 }
 
@@ -1459,7 +1459,7 @@ function generateExpenseMarkdown(viaje, gastos, limite){
     });
   }
 
-  md += `\n---\n_Generado con Bitácora de Piso — AlSuper · ${new Date().toLocaleString("es-MX")}_\n`;
+  md += `\n---\n_Generado con Bitácora AlSuper de José Rojas · ${new Date().toLocaleString("es-MX")}_\n`;
   return md;
 }
 
