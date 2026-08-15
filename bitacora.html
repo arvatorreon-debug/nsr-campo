@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bitácora de Piso — AlSuper</title>
+<meta name="theme-color" content="#A6192E">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+  :root{
+    --rojo:#A6192E;
+    --rojo-oscuro:#5C0F1F;
+    --amarillo:#C9A227;
+    --blanco:#FFFFFF;
+    --marfil:#FBF7EF;
+    --gris-100:#F6F0E3;
+    --gris-300:#E3D6BE;
+    --gris-500:#8C7A61;
+    --tinta:#241009;
+    --ok:#1E7F45;
+    --radius:16px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--font);
+    color:var(--tinta);
+    padding-bottom:88px;
+    -webkit-font-smoothing:antialiased;
+    background-color:#3B0A16;
+    background-image:
+      /* fine gold foil pinstripe */
+      repeating-linear-gradient(135deg, rgba(201,162,39,.07) 0px, rgba(201,162,39,.07) 1px, transparent 1px, transparent 27px),
+      repeating-linear-gradient(135deg, rgba(255,255,255,.025) 0px, rgba(255,255,255,.025) 1px, transparent 1px, transparent 27px, transparent 54px),
+      /* deep crimson vignette */
+      radial-gradient(circle at 50% -10%, #6E1327 0%, #3B0A16 55%, #260610 100%);
+    background-attachment: scroll;
+  }
+  header.app-top{
+    background:linear-gradient(135deg, #B91E34 0%, var(--rojo) 45%, var(--rojo-oscuro) 100%);
+    color:var(--blanco);
+    padding:18px 18px 22px;
+    position:sticky;
+    top:0;
+    z-index:20;
+    box-shadow:0 4px 18px rgba(0,0,0,.35);
+    border-bottom:2px solid var(--amarillo);
+  }
+  header.app-top .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  header.app-top .brand .chip{
+    background:var(--amarillo);
+    color:#2A1D02;
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:.08em;
+    padding:4px 10px;
+    border-radius:999px;
+    text-transform:uppercase;
+  }
+  header.app-top h1{
+    margin:8px 0 0;
+    font-family:var(--font-serif);
+    font-size:25px;
+    font-weight:700;
+    letter-spacing:.01em;
+  }
+  header.app-top p{
+    margin:3px 0 0;
+    font-size:13px;
+    font-style:italic;
+    opacity:.85;
+    letter-spacing:.01em;
+  }
+  nav.tabs{
+    display:flex;
+    gap:6px;
+    margin:14px 0 -22px;
+    background:rgba(255,255,255,.14);
+    padding:4px;
+    border-radius:12px;
+  }
+  nav.tabs button{
+    flex:1;
+    border:0;
+    background:transparent;
+    color:var(--blanco);
+    padding:9px 6px;
+    font-size:13px;
+    font-weight:700;
+    border-radius:9px;
+    opacity:.75;
+  }
+  nav.tabs button.active{
+    background:var(--blanco);
+    color:var(--rojo);
+    opacity:1;
+  }
+
+  /* ---- mode switch (Bitácora / Viáticos) ---- */
+  .mode-switch{
+    display:flex;
+    gap:8px;
+    margin-top:14px;
+  }
+  .mode-btn{
+    flex:1;
+    border:1.5px solid rgba(255,255,255,.4);
+    background:rgba(255,255,255,.06);
+    color:var(--blanco);
+    padding:9px 8px;
+    font-size:12.5px;
+    font-weight:700;
+    font-family:var(--font-serif);
+    font-style:italic;
+    border-radius:10px;
+    opacity:.8;
+  }
+  .mode-btn.active{
+    background:var(--amarillo);
+    border-color:var(--amarillo);
+    color:#2A1D02;
+    opacity:1;
+  }
+
+  main{
+    max-width:640px;
+    margin:0 auto;
+    padding:34px 14px 20px;
+  }
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ---- stat cards (viáticos summary) ---- */
+  .stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .stat-card{
+    background:var(--gris-100);
+    border:1px solid var(--gris-300);
+    border-radius:10px;
+    padding:10px 12px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .stat-card.total{
+    background:var(--rojo);
+    border-color:var(--rojo-oscuro);
+    grid-column:1 / -1;
+  }
+  .stat-card.total .stat-label,
+  .stat-card.total .stat-value{color:var(--blanco);}
+  .stat-label{font-size:11px;font-weight:700;color:var(--gris-500);text-transform:uppercase;letter-spacing:.04em;}
+  .stat-value{font-size:18px;font-weight:800;font-family:var(--font-serif);color:var(--tinta);}
+
+  /* ---- mini table (alimentos por día) ---- */
+  table.mini-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.mini-table th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--gris-500);
+    padding:0 6px 6px;
+    border-bottom:1.5px solid var(--gris-300);
+  }
+  table.mini-table td{
+    padding:8px 6px;
+    border-bottom:1px solid var(--gris-300);
+  }
+  table.mini-table tr:last-child td{border-bottom:0;}
+
+  .pill{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:700;
+    padding:3px 9px;
+    border-radius:999px;
+  }
+  .pill-ok{background:rgba(30,127,69,.12);color:var(--ok);}
+  .pill-warn{background:rgba(166,25,46,.12);color:var(--rojo);}
+
+  .gasto-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    padding:11px 0;
+    border-bottom:1px solid var(--gris-300);
+  }
+  .gasto-row:last-child{border-bottom:0;}
+  .gasto-info b{display:block;font-size:14.5px;}
+  .gasto-info span{font-size:12px;color:var(--gris-500);}
+  .gasto-monto{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:800;
+    font-family:var(--font-serif);
+    white-space:nowrap;
+  }
+  .icon-btn.mini2{width:30px;height:30px;font-size:14px;}
+
+  /* ---- ticket / receipt signature card ---- */
+  .ticket{
+    background:var(--marfil);
+    border-radius:var(--radius);
+    border:1px solid var(--gris-300);
+    box-shadow:0 1px 3px rgba(0,0,0,.10), 0 12px 28px rgba(36,16,9,.28);
+    margin-bottom:18px;
+    position:relative;
+    overflow:hidden;
+  }
+  .ticket .zig{
+    height:3px;
+    background:linear-gradient(90deg, transparent, var(--amarillo) 50%, transparent);
+    opacity:.8;
+  }
+  .ticket-body{padding:18px;}
+  .section-label{
+    font-family:var(--font-serif);
+    font-size:13px;
+    font-weight:700;
+    font-style:italic;
+    letter-spacing:.02em;
+    color:var(--rojo);
+    margin:0 0 12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--gris-300);
+    padding-bottom:8px;
+  }
+
+  label.field{display:block;margin-bottom:12px;}
+  label.field span{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    color:var(--gris-500);
+    margin-bottom:4px;
+  }
+  input[type=text], input[type=date], input[type=time], textarea, select{
+    width:100%;
+    border:1.5px solid var(--gris-300);
+    border-radius:10px;
+    padding:10px 12px;
+    font-size:15px;
+    font-family:var(--font);
+    background:var(--blanco);
+    color:var(--tinta);
+  }
+  textarea{resize:vertical;min-height:56px;}
+  input:focus, textarea:focus, select:focus{
+    outline:none;
+    border-color:var(--rojo);
+    box-shadow:0 0 0 3px rgba(166,25,46,.12);
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  .category{
+    border:1.5px solid var(--gris-300);
+    border-radius:12px;
+    margin-bottom:12px;
+    overflow:hidden;
+  }
+  .category-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 12px;
+    background:var(--gris-100);
+  }
+  .category-head input[type=text]{
+    border:0;
+    background:transparent;
+    font-weight:800;
+    font-size:14.5px;
+    padding:4px 2px;
+  }
+  .category-body{padding:10px 12px 12px;}
+  .item-row{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    margin-bottom:8px;
+  }
+  .item-row input[type=checkbox]{
+    width:20px;height:20px;
+    accent-color:var(--rojo);
+    margin-top:9px;
+    flex-shrink:0;
+  }
+  .item-row input[type=text]{flex:1;}
+  .item-row button.mini{flex-shrink:0;}
+
+  button{
+    cursor:pointer;
+    font-family:var(--font);
+  }
+  button.mini{
+    border:0;
+    background:var(--gris-300);
+    color:var(--tinta);
+    width:30px;height:30px;
+    border-radius:8px;
+    font-size:16px;
+    line-height:1;
+  }
+  button.ghost{
+    border:1.5px dashed var(--gris-300);
+    background:transparent;
+    color:var(--gris-500);
+    font-weight:700;
+    font-size:13px;
+    padding:8px 12px;
+    border-radius:9px;
+    width:100%;
+    margin-top:2px;
+  }
+  button.ghost:hover{border-color:var(--rojo);color:var(--rojo);}
+  button.cat-del{
+    border:0;background:transparent;color:var(--rojo);font-size:18px;font-weight:800;
+  }
+
+  .add-cat-btn{
+    background:var(--marfil);
+    border:1.5px dashed var(--amarillo);
+    color:var(--rojo-oscuro);
+    font-weight:700;
+    font-family:var(--font-serif);
+    font-style:italic;
+    font-size:14.5px;
+    padding:12px;
+    border-radius:12px;
+    width:100%;
+    margin-bottom:16px;
+  }
+
+  .primary-btn{
+    width:100%;
+    background:linear-gradient(135deg, #B91E34, var(--rojo-oscuro));
+    color:var(--blanco);
+    font-weight:700;
+    font-family:var(--font-serif);
+    letter-spacing:.02em;
+    font-size:16.5px;
+    padding:16px;
+    border:0;
+    border-radius:12px;
+    border:1px solid var(--amarillo);
+    box-shadow:0 8px 20px rgba(92,15,31,.4);
+  }
+  .primary-btn:active{transform:translateY(1px);}
+  .secondary-btn{
+    width:100%;
+    background:var(--marfil);
+    color:var(--rojo-oscuro);
+    border:1.5px solid var(--amarillo);
+    font-weight:700;
+    font-family:var(--font-serif);
+    font-style:italic;
+    font-size:14.5px;
+    padding:12px;
+    border-radius:12px;
+    margin-top:10px;
+  }
+
+  .history-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    padding:14px 16px;
+  }
+  .history-item + .history-item{border-top:1px solid var(--gris-300);}
+  .history-item .info b{display:block;font-size:15px;}
+  .history-item .info span{font-size:12.5px;color:var(--gris-500);}
+  .history-actions{display:flex;gap:6px;}
+  .icon-btn{
+    border:0;
+    background:var(--gris-100);
+    border-radius:8px;
+    width:36px;height:36px;
+    font-size:16px;
+  }
+  .icon-btn.danger{color:var(--rojo);}
+
+  .empty{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--gris-500);
+  }
+  .empty .big{font-size:34px;margin-bottom:6px;}
+
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--tinta);
+    color:var(--marfil);
+    border:1px solid var(--amarillo);
+    padding:12px 18px;
+    border-radius:999px;
+    font-size:13.5px;
+    font-weight:600;
+    opacity:0;
+    pointer-events:none;
+    transition:.25s ease;
+    z-index:100;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.ok{background:var(--ok);}
+
+  .badge-offline{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:11px;font-weight:700;color:var(--blanco);opacity:.85;
+    margin-top:8px;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--amarillo);}
+
+  hr.soft{border:0;border-top:1px solid var(--gris-300);margin:14px 0;}
+
+  .help{font-size:12px;color:var(--gris-500);margin:-6px 0 14px;line-height:1.4;}
+</style>
+</head>
+<body>
+
+<header class="app-top">
+  <div class="brand">
+    <span class="chip">AlSuper</span>
+    <span class="chip" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);">Piso</span>
+  </div>
+  <h1 id="app-title">Bitácora de Piso</h1>
+  <p id="app-sub">Visitas de tienda · checklist · exporta directo a Markdown</p>
+  <span class="badge-offline"><span class="dot"></span> Funciona sin internet — guarda todo en este dispositivo</span>
+
+  <div class="mode-switch">
+    <button class="mode-btn active" data-mode="bitacora">🏬 Bitácora de Piso</button>
+    <button class="mode-btn" data-mode="viaticos">🧳 Viáticos de Viaje</button>
+  </div>
+
+  <nav class="tabs" id="tabs-bitacora">
+    <button data-view="nueva" class="active">Nueva visita</button>
+    <button data-view="historial">Historial</button>
+    <button data-view="personalizar">Checklist</button>
+  </nav>
+  <nav class="tabs" id="tabs-viaticos" style="display:none;">
+    <button data-view="viat-nuevo" class="active">Nuevo gasto</button>
+    <button data-view="viat-resumen">Resumen y viajes</button>
+  </nav>
+</header>
+
+<main>
+  <div id="mode-content-bitacora">
+
+  <!-- ===================== NUEVA VISITA ===================== -->
+  <section id="view-nueva" class="view active">
+
+    <div class="ticket">
+      <div class="ticket-body">
+        <p class="section-label">Datos de la visita</p>
+        <label class="field">
+          <span>Tienda / Sucursal</span>
+          <input type="text" id="f-tienda" list="sucursales-list" placeholder="Elige una sucursal o escribe una nueva...">
+          <datalist id="sucursales-list"></datalist>
+        </label>
+        <div class="row2">
+          <label class="field">
+            <span>Fecha</span>
+            <input type="date" id="f-fecha">
+          </label>
+          <label class="field">
+            <span>Hora</span>
+            <input type="time" id="f-hora">
+          </label>
+        </div>
+        <label class="field">
+          <span>Visitante</span>
+          <input type="text" id="f-visitante" value="José Alfonso Rojas Vázquez">
+        </label>
+        <label class="field">
+          <span>Etiquetas (opcional, separadas por coma — para Obsidian)</span>
+          <input type="text" id="f-tags" placeholder="ecommerce, urgente, seguimiento">
+        </label>
+        <label class="field" style="margin-bottom:0;">
+          <span>Resumen / contexto de la visita</span>
+          <textarea id="f-resumen" placeholder="Motivo de la visita, con quién te reuniste, contexto general..."></textarea>
+        </label>
+      </div>
+      <div class="zig"></div>
+    </div>
+
+    <div id="categorias-container"></div>
+
+    <button class="add-cat-btn" id="btn-add-cat">+ Agregar categoría</button>
+
+    <div class="ticket">
+      <div class="ticket-body">
+        <p class="section-label">Observaciones generales</p>
+        <label class="field" style="margin-bottom:0;">
+          <span>Notas finales, pendientes, próximos pasos</span>
+          <textarea id="f-notasfinales" style="min-height:90px;" placeholder="Ej. Dar seguimiento a merma en lácteos, confirmar con gerente de tienda..."></textarea>
+        </label>
+      </div>
+      <div class="zig"></div>
+    </div>
+
+    <button class="primary-btn" id="btn-guardar">Guardar y descargar .md</button>
+    <p class="help" style="text-align:center;margin-top:10px;">Se guarda en este dispositivo y se descarga el archivo Markdown listo para tu vault de Obsidian.</p>
+  </section>
+
+  <!-- ===================== HISTORIAL ===================== -->
+  <section id="view-historial" class="view">
+    <div class="ticket">
+      <div id="historial-list"></div>
+    </div>
+    <button class="secondary-btn" id="btn-export-all" style="display:none;">Descargar todo el historial (.md combinado)</button>
+  </section>
+
+  <!-- ===================== PERSONALIZAR ===================== -->
+  <section id="view-personalizar" class="view">
+    <div class="ticket">
+      <div class="ticket-body">
+        <p class="section-label">Checklist por defecto</p>
+        <p class="help" style="margin-top:-4px;">Edita aquí las categorías que quieres que aparezcan precargadas cada vez que abras "Nueva visita". Los cambios que hagas dentro de una visita en curso no afectan esta plantilla.</p>
+      </div>
+    </div>
+    <div id="template-container"></div>
+    <button class="add-cat-btn" id="btn-add-cat-template">+ Agregar categoría a la plantilla</button>
+    <button class="primary-btn" id="btn-save-template">Guardar plantilla</button>
+    <button class="secondary-btn" id="btn-reset-template">Restaurar checklist original de AlSuper</button>
+  </section>
+
+  </div>
+
+  <div id="mode-content-viaticos" style="display:none;">
+
+  <!-- ===================== VIÁTICOS: NUEVO GASTO ===================== -->
+  <section id="view-viat-nuevo" class="view active">
+    <div class="ticket">
+      <div class="ticket-body">
+        <p class="section-label">Registrar gasto de viaje</p>
+        <label class="field">
+          <span>Viaje / Motivo</span>
+          <input type="text" id="vg-viaje" list="viajes-list" placeholder="Ej. Viaje Monterrey Mayo 2026">
+          <datalist id="viajes-list"></datalist>
+        </label>
+        <div class="row2">
+          <label class="field">
+            <span>Fecha</span>
+            <input type="date" id="vg-fecha">
+          </label>
+          <label class="field">
+            <span>Categoría</span>
+            <select id="vg-categoria">
+              <option>Transporte</option>
+              <option>Alimentos</option>
+              <option>Hospedaje</option>
+              <option>Gasolina</option>
+              <option>Otro</option>
+            </select>
+          </label>
+        </div>
+        <label class="field">
+          <span>Descripción</span>
+          <input type="text" id="vg-desc" placeholder="Ej. Uber al aeropuerto, comida con cliente, casetas...">
+        </label>
+        <div class="row2">
+          <label class="field">
+            <span>Monto (MXN)</span>
+            <input type="text" inputmode="decimal" id="vg-monto" placeholder="0.00">
+          </label>
+          <label class="field">
+            <span>Método de pago</span>
+            <select id="vg-metodo">
+              <option>Efectivo</option>
+              <option>Tarjeta empresa</option>
+              <option>Tarjeta personal</option>
+              <option>Transferencia</option>
+            </select>
+          </label>
+        </div>
+        <label class="field" style="margin-bottom:0;">
+          <span>Notas (opcional)</span>
+          <textarea id="vg-notas" placeholder="Folio de factura, con quién, referencia..."></textarea>
+        </label>
+      </div>
+      <div class="zig"></div>
+    </div>
+
+    <button class="primary-btn" id="btn-guardar-gasto">Agregar gasto</button>
+    <p class="help" style="text-align:center;margin-top:10px;">Se guarda en este dispositivo. El Markdown completo del viaje se exporta desde "Resumen y viajes".</p>
+
+    <div class="ticket" id="hoy-resumen-card" style="display:none;">
+      <div class="ticket-body">
+        <p class="section-label">Alimentos registrados hoy <span id="hoy-fecha-label" style="font-style:normal;font-weight:400;font-size:11px;color:var(--gris-500);"></span></p>
+        <div id="hoy-alimentos-total"></div>
+      </div>
+      <div class="zig"></div>
+    </div>
+  </section>
+
+  <!-- ===================== VIÁTICOS: RESUMEN Y VIAJES ===================== -->
+  <section id="view-viat-resumen" class="view">
+    <div class="ticket">
+      <div class="ticket-body">
+        <p class="section-label">Selecciona un viaje</p>
+        <label class="field" style="margin-bottom:0;">
+          <select id="sel-viaje"></select>
+        </label>
+      </div>
+    </div>
+
+    <div id="resumen-content"></div>
+
+    <div class="ticket">
+      <div class="ticket-body">
+        <p class="section-label">Límite diario de alimentos</p>
+        <div class="row2">
+          <label class="field" style="margin-bottom:0;">
+            <span>Monto MXN / día</span>
+            <input type="text" inputmode="decimal" id="limite-input">
+          </label>
+          <div style="display:flex;align-items:flex-end;">
+            <button class="secondary-btn" id="btn-guardar-limite" style="margin-top:0;width:100%;">Guardar límite</button>
+          </div>
+        </div>
+        <p class="help" style="margin:10px 0 0;">Este límite aplica a todos tus viajes (el que te marca la empresa por día en alimentos).</p>
+      </div>
+    </div>
+
+    <button class="secondary-btn" id="btn-export-all-viaticos">Descargar todos los viáticos (.md combinado)</button>
+  </section>
+
+  </div>
+</main>
+
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATOS ============ */
+const LS_VISITS = "as_visitas_v1";
+const LS_TEMPLATE = "as_template_v1";
+
+const DEFAULT_TEMPLATE = [
+  { nombre: "Presentación y Limpieza", items: [
+    "Piso, pasillos y accesos limpios",
+    "Anaqueles surtidos y frentados",
+    "Cámaras frías y refrigeradores en orden",
+    "Área de cajas limpia y funcional"
+  ]},
+  { nombre: "Abasto e Inventario", items: [
+    "Sin quiebres de stock en productos clave",
+    "Rotación correcta (PEPS)",
+    "Recepción de mercancía sin cuellos de botella",
+    "Merma dentro de rango esperado"
+  ]},
+  { nombre: "Precios y Etiquetado", items: [
+    "Etiquetas de precio correctas y visibles",
+    "Promociones vigentes bien señalizadas",
+    "Sin discrepancias precio anaquel vs sistema"
+  ]},
+  { nombre: "❄️ Cadena de Frío & Staging (E-grocery)", items: [
+    "Racks y lockers de staging limpios y rotulados (Seco/Frío/Congelado)",
+    "Congeladores y coolers en temperatura adecuada (≤ 4°C / ≤ -18°C)",
+    "Insumos y geles fríos congelados listos en módulo"
+  ]},
+  { nombre: "📦 Picking, Pack & Delivery (E-grocery)", items: [
+    "Tiempos de picking dentro de meta",
+    "Pickers operando con carrito/bolsas normadas y escáner",
+    "Personal de surtido identificado y capacitado",
+    "Cajones de Click & Collect libres y señalizados",
+    "Zona de empaque/entrega ordenada",
+    "Validación visual de frescura/caducidad en perecederos",
+    "Incidencias de pedidos (faltantes, sustituciones) registradas"
+  ]},
+  { nombre: "Personal y Atención", items: [
+    "Personal uniformado y en su puesto",
+    "Actitud de servicio adecuada",
+    "Cobertura de turno completa"
+  ]},
+  { nombre: "Seguridad y Mantenimiento", items: [
+    "Salidas de emergencia despejadas",
+    "Extintores vigentes y accesibles",
+    "Sin riesgos eléctricos o estructurales visibles"
+  ]}
+];
+
+/* ---- Catálogo de sucursales (semilla por región) ---- */
+const LS_SUCURSALES_EXTRA = "as_sucursales_extra_v1";
+const SUCURSALES_SEED = [
+  // Comarca Lagunera (Coahuila / Durango)
+  "Vasconcelos (Torreón)", "Campesino (Torreón)", "Fresno (Torreón)", "Triana (Torreón)",
+  "Senderos (Torreón)", "Gómez Palacio - Hamburgo", "Gómez Palacio - Centro", "Lerdo",
+  // Región Saltillo
+  "Saltillo - Sucursal 1", "Saltillo - Sucursal 2", "Saltillo - Sucursal 3",
+  // Región Durango Capital
+  "Durango - Sucursal 1", "Durango - Sucursal 2", "Durango - Sucursal 3",
+  // Región Zacatecas
+  "Zacatecas - Sucursal 1", "Zacatecas - Sucursal 2"
+];
+
+function loadSucursalesExtra(){
+  const raw = localStorage.getItem(LS_SUCURSALES_EXTRA);
+  return raw ? JSON.parse(raw) : [];
+}
+function saveSucursalExtra(nombre){
+  if(!nombre) return;
+  const extra = loadSucursalesExtra();
+  if(!extra.includes(nombre) && !SUCURSALES_SEED.includes(nombre)){
+    extra.push(nombre);
+    localStorage.setItem(LS_SUCURSALES_EXTRA, JSON.stringify(extra));
+  }
+}
+function getSucursalesConocidas(){
+  const usadas = loadVisits().map(v=>v.tienda).filter(Boolean);
+  const todas = new Set([...SUCURSALES_SEED, ...loadSucursalesExtra(), ...usadas]);
+  return Array.from(todas).sort((a,b)=>a.localeCompare(b,'es'));
+}
+function renderSucursalesList(){
+  const dl = document.getElementById("sucursales-list");
+  if(!dl) return;
+  dl.innerHTML = getSucursalesConocidas().map(s=>`<option value="${escapeAttr(s)}">`).join("");
+}
+
+function loadTemplate(){
+  const raw = localStorage.getItem(LS_TEMPLATE);
+  return raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(DEFAULT_TEMPLATE));
+}
+function saveTemplateToStorage(t){
+  localStorage.setItem(LS_TEMPLATE, JSON.stringify(t));
+}
+function loadVisits(){
+  const raw = localStorage.getItem(LS_VISITS);
+  return raw ? JSON.parse(raw) : [];
+}
+function saveVisits(v){
+  localStorage.setItem(LS_VISITS, JSON.stringify(v));
+}
+
+let uidCounter = 0;
+function uid(){ uidCounter++; return "id" + Date.now().toString(36) + uidCounter; }
+
+/* ============ TABS (scoped per nav, so Bitácora/Viáticos don't step on each other) ============ */
+document.querySelectorAll("nav.tabs button").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const nav = btn.closest("nav.tabs");
+    nav.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const container = nav.id === "tabs-viaticos" ? document.getElementById("mode-content-viaticos") : document.getElementById("mode-content-bitacora");
+    container.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.getElementById("view-"+btn.dataset.view).classList.add("active");
+    if(btn.dataset.view === "historial") renderHistory();
+    if(btn.dataset.view === "personalizar") renderTemplateEditor();
+    if(btn.dataset.view === "viat-resumen") { document.getElementById("limite-input").value = loadLimit(); renderViajeSelect(); }
+  });
+});
+
+/* ============ MODE SWITCH (Bitácora de Piso / Viáticos de Viaje) ============ */
+document.querySelectorAll(".mode-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".mode-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const mode = btn.dataset.mode;
+    const isBitacora = mode === "bitacora";
+    document.getElementById("tabs-bitacora").style.display = isBitacora ? "flex" : "none";
+    document.getElementById("tabs-viaticos").style.display = isBitacora ? "none" : "flex";
+    document.getElementById("mode-content-bitacora").style.display = isBitacora ? "" : "none";
+    document.getElementById("mode-content-viaticos").style.display = isBitacora ? "none" : "";
+    document.getElementById("app-title").textContent = isBitacora ? "Bitácora de Piso" : "Viáticos de Viaje";
+    document.getElementById("app-sub").textContent = isBitacora
+      ? "Visitas de tienda · checklist · exporta directo a Markdown"
+      : "Transporte · alimentos · hospedaje · gasolina · exporta directo a Markdown";
+    if(!isBitacora){
+      document.getElementById("limite-input").value = loadLimit();
+      renderViajeSelect();
+    }
+  });
+});
+
+/* ============ TOAST ============ */
+function toast(msg, ok=false){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (ok ? " ok" : "");
+  setTimeout(()=>{ t.className = "toast"; }, 2400);
+}
+
+/* ============ FORM: NUEVA VISITA ============ */
+let currentCategories = [];
+
+function initNewVisitForm(){
+  const today = new Date();
+  document.getElementById("f-fecha").value = today.toISOString().slice(0,10);
+  document.getElementById("f-hora").value = today.toTimeString().slice(0,5);
+  document.getElementById("f-tienda").value = "";
+  renderSucursalesList();
+  document.getElementById("f-resumen").value = "";
+  document.getElementById("f-notasfinales").value = "";
+  document.getElementById("f-tags").value = "";
+  currentCategories = JSON.parse(JSON.stringify(loadTemplate())).map(c=>({
+    id: uid(),
+    nombre: c.nombre,
+    items: c.items.map(text => ({ id: uid(), text, checked:false, nota:"" })),
+    notas: ""
+  }));
+  renderCategories();
+}
+
+function renderCategories(){
+  const container = document.getElementById("categorias-container");
+  container.innerHTML = "";
+  currentCategories.forEach(cat=>{
+    const el = document.createElement("div");
+    el.className = "category";
+    el.innerHTML = `
+      <div class="category-head">
+        <input type="text" value="${escapeAttr(cat.nombre)}" data-cat="${cat.id}" class="cat-name-input">
+        <button class="cat-del" data-del-cat="${cat.id}" title="Eliminar categoría">×</button>
+      </div>
+      <div class="category-body">
+        <div class="items-list" data-items-for="${cat.id}"></div>
+        <button class="ghost" data-add-item="${cat.id}">+ Agregar punto al checklist</button>
+        <label class="field" style="margin-top:10px;margin-bottom:0;">
+          <span>Notas de esta categoría</span>
+          <textarea data-cat-notes="${cat.id}" placeholder="Comentarios adicionales...">${escapeHtml(cat.notas)}</textarea>
+        </label>
+      </div>`;
+    container.appendChild(el);
+    renderItems(cat);
+  });
+
+  container.querySelectorAll(".cat-name-input").forEach(inp=>{
+    inp.addEventListener("input", e=>{
+      const cat = currentCategories.find(c=>c.id===e.target.dataset.cat);
+      cat.nombre = e.target.value;
+    });
+  });
+  container.querySelectorAll("[data-del-cat]").forEach(btn=>{
+    btn.addEventListener("click", e=>{
+      currentCategories = currentCategories.filter(c=>c.id!==btn.dataset.delCat);
+      renderCategories();
+    });
+  });
+  container.querySelectorAll("[data-add-item]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const cat = currentCategories.find(c=>c.id===btn.dataset.addItem);
+      cat.items.push({id:uid(), text:"", checked:false, nota:""});
+      renderCategories();
+    });
+  });
+  container.querySelectorAll("[data-cat-notes]").forEach(ta=>{
+    ta.addEventListener("input", e=>{
+      const cat = currentCategories.find(c=>c.id===e.target.dataset.catNotes);
+      cat.notas = e.target.value;
+    });
+  });
+}
+
+function renderItems(cat){
+  const wrap = document.querySelector(`[data-items-for="${cat.id}"]`);
+  wrap.innerHTML = "";
+  cat.items.forEach(item=>{
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.innerHTML = `
+      <input type="checkbox" ${item.checked?"checked":""} data-item-check="${item.id}">
+      <input type="text" value="${escapeAttr(item.text)}" data-item-text="${item.id}" placeholder="Punto a revisar...">
+      <button class="mini" data-item-del="${item.id}" title="Quitar">×</button>`;
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll("[data-item-check]").forEach(cb=>{
+    cb.addEventListener("change", e=>{
+      const it = cat.items.find(i=>i.id===e.target.dataset.itemCheck);
+      it.checked = e.target.checked;
+    });
+  });
+  wrap.querySelectorAll("[data-item-text]").forEach(inp=>{
+    inp.addEventListener("input", e=>{
+      const it = cat.items.find(i=>i.id===e.target.dataset.itemText);
+      it.text = e.target.value;
+    });
+  });
+  wrap.querySelectorAll("[data-item-del]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      cat.items = cat.items.filter(i=>i.id!==btn.dataset.itemDel);
+      renderItems(cat);
+    });
+  });
+}
+
+document.getElementById("btn-add-cat").addEventListener("click", ()=>{
+  currentCategories.push({ id: uid(), nombre: "Nueva categoría", items: [], notas: "" });
+  renderCategories();
+});
+
+/* ============ GUARDAR VISITA ============ */
+document.getElementById("btn-guardar").addEventListener("click", ()=>{
+  const tienda = document.getElementById("f-tienda").value.trim();
+  if(!tienda){
+    toast("Falta el nombre de la tienda 🙄");
+    document.getElementById("f-tienda").focus();
+    return;
+  }
+  const visit = {
+    id: uid(),
+    tienda,
+    fecha: document.getElementById("f-fecha").value,
+    hora: document.getElementById("f-hora").value,
+    visitante: document.getElementById("f-visitante").value.trim(),
+    tags: document.getElementById("f-tags").value.trim(),
+    resumen: document.getElementById("f-resumen").value.trim(),
+    notasFinales: document.getElementById("f-notasfinales").value.trim(),
+    categorias: JSON.parse(JSON.stringify(currentCategories)),
+    creado: new Date().toISOString()
+  };
+  saveSucursalExtra(tienda);
+  const visits = loadVisits();
+  visits.unshift(visit);
+  saveVisits(visits);
+
+  const md = generateMarkdown(visit);
+  downloadFile(filenameFor(visit), md);
+
+  toast("Visita guardada y descargada ✅", true);
+  initNewVisitForm();
+});
+
+/* ============ MARKDOWN ============ */
+function slugify(s){
+  return s.toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-zA-Z0-9]+/g,"_").replace(/^_+|_+$/g,"");
+}
+function filenameFor(v){
+  return `Visita_${slugify(v.tienda)}_${v.fecha}.md`;
+}
+function ymlEscape(s){
+  if(!s) return '""';
+  return `"${String(s).replace(/"/g,'\\"')}"`;
+}
+function generateMarkdown(v){
+  const tagList = ["visita-tienda","alsuper"]
+    .concat(v.tags ? v.tags.split(",").map(t=>t.trim()).filter(Boolean) : []);
+
+  let md = `---\n`;
+  md += `tipo: visita-tienda\n`;
+  md += `tienda: ${ymlEscape(v.tienda)}\n`;
+  md += `fecha: ${v.fecha}\n`;
+  md += `hora: "${v.hora || ""}"\n`;
+  md += `visitante: ${ymlEscape(v.visitante)}\n`;
+  md += `tags: [${tagList.map(t=>`"${t}"`).join(", ")}]\n`;
+  md += `---\n\n`;
+
+  md += `# 🏬 Visita — ${v.tienda}\n`;
+  md += `**Fecha:** ${v.fecha}${v.hora ? " · " + v.hora : ""}  \n`;
+  md += `**Visitante:** ${v.visitante || "—"}\n\n`;
+
+  if(v.resumen){
+    md += `## 📝 Resumen\n${v.resumen}\n\n`;
+  }
+
+  v.categorias.forEach(cat=>{
+    const items = cat.items.filter(i=>i.text && i.text.trim());
+    if(items.length === 0 && !cat.notas) return;
+    md += `## ✅ ${cat.nombre || "Sin nombre"}\n`;
+    items.forEach(i=>{
+      md += `- [${i.checked ? "x" : " "}] ${i.text.trim()}\n`;
+    });
+    if(cat.notas && cat.notas.trim()){
+      md += `\n> **Notas:** ${cat.notas.trim()}\n`;
+    }
+    md += `\n`;
+  });
+
+  if(v.notasFinales){
+    md += `## 📌 Observaciones generales / pendientes\n${v.notasFinales}\n\n`;
+  }
+
+  md += `---\n_Generado con Bitácora de Piso — AlSuper · ${new Date(v.creado).toLocaleString("es-MX")}_\n`;
+  return md;
+}
+
+function downloadFile(filename, content){
+  const blob = new Blob([content], {type:"text/markdown;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+}
+
+/* ============ HISTORIAL ============ */
+function renderHistory(){
+  const visits = loadVisits();
+  const list = document.getElementById("historial-list");
+  const exportAllBtn = document.getElementById("btn-export-all");
+
+  if(visits.length === 0){
+    list.innerHTML = `<div class="empty"><div class="big">🧾</div>Aún no hay visitas guardadas.<br>Ve a "Nueva visita" para empezar.</div>`;
+    exportAllBtn.style.display = "none";
+    return;
+  }
+  exportAllBtn.style.display = "block";
+
+  list.innerHTML = visits.map(v => `
+    <div class="history-item">
+      <div class="info">
+        <b>${escapeHtml(v.tienda)}</b>
+        <span>${v.fecha}${v.hora ? " · " + v.hora : ""}</span>
+      </div>
+      <div class="history-actions">
+        <button class="icon-btn" data-dl="${v.id}" title="Descargar .md">⬇️</button>
+        <button class="icon-btn danger" data-del="${v.id}" title="Eliminar">🗑️</button>
+      </div>
+    </div>`).join("");
+
+  list.querySelectorAll("[data-dl]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const v = loadVisits().find(x=>x.id===btn.dataset.dl);
+      downloadFile(filenameFor(v), generateMarkdown(v));
+      toast("Descargando .md ⬇️");
+    });
+  });
+  list.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      if(!confirm("¿Borrar esta visita del historial local? (el .md ya descargado no se ve afectado)")) return;
+      const visits = loadVisits().filter(x=>x.id!==btn.dataset.del);
+      saveVisits(visits);
+      renderHistory();
+      toast("Visita eliminada del historial");
+    });
+  });
+}
+
+document.getElementById("btn-export-all").addEventListener("click", ()=>{
+  const visits = loadVisits();
+  if(visits.length === 0) return;
+  const combined = visits.map(v => generateMarkdown(v)).join("\n\n---\n\n");
+  downloadFile(`Bitacora_AlSuper_Backup_${new Date().toISOString().slice(0,10)}.md`, combined);
+  toast("Backup combinado descargado (sepáralo en Obsidian con --- )", true);
+});
+
+/* ============ PERSONALIZAR PLANTILLA ============ */
+let templateDraft = [];
+
+function renderTemplateEditor(){
+  templateDraft = JSON.parse(JSON.stringify(loadTemplate()));
+  drawTemplate();
+}
+function drawTemplate(){
+  const container = document.getElementById("template-container");
+  container.innerHTML = "";
+  templateDraft.forEach((cat, ci)=>{
+    const el = document.createElement("div");
+    el.className = "category";
+    el.innerHTML = `
+      <div class="category-head">
+        <input type="text" value="${escapeAttr(cat.nombre)}" data-t-cat="${ci}">
+        <button class="cat-del" data-t-del-cat="${ci}">×</button>
+      </div>
+      <div class="category-body">
+        <div data-t-items="${ci}"></div>
+        <button class="ghost" data-t-add-item="${ci}">+ Agregar punto</button>
+      </div>`;
+    container.appendChild(el);
+    const itemsWrap = el.querySelector(`[data-t-items="${ci}"]`);
+    cat.items.forEach((text, ii)=>{
+      const row = document.createElement("div");
+      row.className = "item-row";
+      row.style.marginLeft = "0";
+      row.innerHTML = `
+        <input type="text" value="${escapeAttr(text)}" data-t-item="${ci}:${ii}" style="margin-left:28px;">
+        <button class="mini" data-t-del-item="${ci}:${ii}">×</button>`;
+      itemsWrap.appendChild(row);
+    });
+  });
+
+  container.querySelectorAll("[data-t-cat]").forEach(inp=>{
+    inp.addEventListener("input", e=> templateDraft[e.target.dataset.tCat].nombre = e.target.value);
+  });
+  container.querySelectorAll("[data-t-del-cat]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      templateDraft.splice(btn.dataset.tDelCat, 1);
+      drawTemplate();
+    });
+  });
+  container.querySelectorAll("[data-t-add-item]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      templateDraft[btn.dataset.tAddItem].items.push("");
+      drawTemplate();
+    });
+  });
+  container.querySelectorAll("[data-t-item]").forEach(inp=>{
+    inp.addEventListener("input", e=>{
+      const [ci,ii] = e.target.dataset.tItem.split(":");
+      templateDraft[ci].items[ii] = e.target.value;
+    });
+  });
+  container.querySelectorAll("[data-t-del-item]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const [ci,ii] = btn.dataset.tDelItem.split(":");
+      templateDraft[ci].items.splice(ii,1);
+      drawTemplate();
+    });
+  });
+}
+
+document.getElementById("btn-add-cat-template").addEventListener("click", ()=>{
+  templateDraft.push({ nombre:"Nueva categoría", items:[""] });
+  drawTemplate();
+});
+document.getElementById("btn-save-template").addEventListener("click", ()=>{
+  const clean = templateDraft
+    .map(c=>({ nombre: c.nombre.trim() || "Sin nombre", items: c.items.map(i=>i.trim()).filter(Boolean) }))
+    .filter(c=>c.nombre);
+  saveTemplateToStorage(clean);
+  toast("Plantilla guardada — se usará en tus próximas visitas ✅", true);
+});
+document.getElementById("btn-reset-template").addEventListener("click", ()=>{
+  if(!confirm("¿Restaurar el checklist original de AlSuper? Se perderán tus cambios personalizados.")) return;
+  saveTemplateToStorage(JSON.parse(JSON.stringify(DEFAULT_TEMPLATE)));
+  renderTemplateEditor();
+  toast("Checklist restaurado");
+});
+
+/* ================================================================
+   VIÁTICOS DE VIAJE
+   ================================================================ */
+const LS_EXPENSES = "as_viaticos_v1";
+const LS_LIMIT = "as_limite_alimentos_v1";
+const CATEGORIAS_VIATICOS = ["Transporte","Alimentos","Hospedaje","Gasolina","Otro"];
+
+function loadExpenses(){
+  const raw = localStorage.getItem(LS_EXPENSES);
+  return raw ? JSON.parse(raw) : [];
+}
+function saveExpenses(list){
+  localStorage.setItem(LS_EXPENSES, JSON.stringify(list));
+}
+function loadLimit(){
+  const raw = localStorage.getItem(LS_LIMIT);
+  return raw ? parseFloat(raw) : 300;
+}
+function saveLimitToStorage(n){
+  localStorage.setItem(LS_LIMIT, String(n));
+}
+function parseMonto(raw){
+  return parseFloat(String(raw).trim().replace(",", "."));
+}
+function money(n){
+  return "$" + (n || 0).toLocaleString("es-MX", {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+/* ---- Nuevo gasto: init + guardar ---- */
+function initGastoForm(){
+  const fechaInput = document.getElementById("vg-fecha");
+  if(!fechaInput.value){
+    fechaInput.value = new Date().toISOString().slice(0,10);
+  }
+  const listEl = document.getElementById("viajes-list");
+  listEl.innerHTML = getViajesOrdenados().map(v=>`<option value="${escapeAttr(v)}">`).join("");
+}
+
+document.getElementById("btn-guardar-gasto").addEventListener("click", ()=>{
+  const viaje = document.getElementById("vg-viaje").value.trim();
+  const fecha = document.getElementById("vg-fecha").value;
+  const categoria = document.getElementById("vg-categoria").value;
+  const descripcion = document.getElementById("vg-desc").value.trim();
+  const monto = parseMonto(document.getElementById("vg-monto").value);
+  const metodo = document.getElementById("vg-metodo").value;
+  const notas = document.getElementById("vg-notas").value.trim();
+
+  if(!viaje){
+    toast("Falta el nombre del viaje 🙄");
+    document.getElementById("vg-viaje").focus();
+    return;
+  }
+  if(!fecha){
+    toast("Falta la fecha");
+    return;
+  }
+  if(isNaN(monto) || monto <= 0){
+    toast("Pon un monto válido");
+    document.getElementById("vg-monto").focus();
+    return;
+  }
+
+  const list = loadExpenses();
+  list.push({
+    id: uid(), viaje, fecha, categoria, descripcion, monto, metodo, notas,
+    creado: new Date().toISOString()
+  });
+  saveExpenses(list);
+
+  document.getElementById("vg-desc").value = "";
+  document.getElementById("vg-monto").value = "";
+  document.getElementById("vg-notas").value = "";
+  document.getElementById("vg-desc").focus();
+  document.getElementById("viajes-list").innerHTML = getViajesOrdenados().map(v=>`<option value="${escapeAttr(v)}">`).join("");
+
+  updateHoyResumen(viaje, fecha);
+  toast("Gasto agregado ✅", true);
+});
+
+function updateHoyResumen(viaje, fecha){
+  const limite = loadLimit();
+  const gastosHoy = loadExpenses().filter(e => e.viaje === viaje && e.fecha === fecha && e.categoria === "Alimentos");
+  const card = document.getElementById("hoy-resumen-card");
+  if(gastosHoy.length === 0){
+    card.style.display = "none";
+    return;
+  }
+  const total = gastosHoy.reduce((s,e)=>s+e.monto, 0);
+  const over = total > limite;
+  card.style.display = "block";
+  document.getElementById("hoy-fecha-label").textContent = "· " + fecha;
+  document.getElementById("hoy-alimentos-total").innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card"><span class="stat-label">Gastado hoy</span><span class="stat-value">${money(total)}</span></div>
+      <div class="stat-card"><span class="stat-label">Límite del día</span><span class="stat-value">${money(limite)}</span></div>
+    </div>
+    <p style="margin:12px 0 0;text-align:center;">
+      <span class="pill ${over ? "pill-warn" : "pill-ok"}">${over ? "⚠️ Excedido por " + money(total - limite) : "✅ Dentro del límite"}</span>
+    </p>`;
+}
+
+/* ---- Resumen y viajes ---- */
+function getViajesOrdenados(){
+  const exp = loadExpenses();
+  const ultimaFecha = {};
+  exp.forEach(e=>{
+    if(!e.viaje) return;
+    if(!ultimaFecha[e.viaje] || e.fecha > ultimaFecha[e.viaje]) ultimaFecha[e.viaje] = e.fecha;
+  });
+  return Object.keys(ultimaFecha).sort((a,b)=> ultimaFecha[b].localeCompare(ultimaFecha[a]));
+}
+
+function renderViajeSelect(){
+  const sel = document.getElementById("sel-viaje");
+  const prev = sel.value;
+  const viajes = getViajesOrdenados();
+  sel.innerHTML = viajes.length
+    ? viajes.map(v=>`<option value="${escapeAttr(v)}">${escapeHtml(v)}</option>`).join("")
+    : `<option value="">— sin viajes registrados todavía —</option>`;
+  if(viajes.includes(prev)) sel.value = prev;
+  if(!sel.onchange){
+    sel.onchange = renderResumenViaje;
+  }
+  renderResumenViaje();
+}
+
+function renderResumenViaje(){
+  const viaje = document.getElementById("sel-viaje").value;
+  const container = document.getElementById("resumen-content");
+  const gastos = loadExpenses().filter(e => e.viaje === viaje).sort((a,b)=> a.fecha.localeCompare(b.fecha));
+
+  if(!viaje || gastos.length === 0){
+    container.innerHTML = `<div class="ticket"><div class="empty"><div class="big">🧳</div>Aún no hay gastos registrados para este viaje.<br>Ve a "Nuevo gasto" para empezar.</div></div>`;
+    return;
+  }
+
+  const limite = loadLimit();
+  const totales = {};
+  CATEGORIAS_VIATICOS.forEach(c => totales[c] = 0);
+  let totalGeneral = 0;
+  gastos.forEach(g=>{
+    const cat = CATEGORIAS_VIATICOS.includes(g.categoria) ? g.categoria : "Otro";
+    totales[cat] += g.monto;
+    totalGeneral += g.monto;
+  });
+
+  const diasAlimentos = {};
+  gastos.filter(g=>g.categoria === "Alimentos").forEach(g=>{
+    diasAlimentos[g.fecha] = (diasAlimentos[g.fecha] || 0) + g.monto;
+  });
+  const dias = Object.keys(diasAlimentos).sort();
+  const fechaMin = gastos[0].fecha;
+  const fechaMax = gastos[gastos.length - 1].fecha;
+
+  let html = `<div class="ticket"><div class="ticket-body">
+    <p class="section-label">Resumen — ${escapeHtml(viaje)}</p>
+    <p style="font-size:12.5px;color:var(--gris-500);margin:-8px 0 12px;">${fechaMin} a ${fechaMax} · ${gastos.length} gasto${gastos.length===1?"":"s"} registrado${gastos.length===1?"":"s"}</p>
+    <div class="stat-grid">
+      ${CATEGORIAS_VIATICOS.map(c=>`
+        <div class="stat-card">
+          <span class="stat-label">${c}</span>
+          <span class="stat-value">${money(totales[c])}</span>
+        </div>`).join("")}
+      <div class="stat-card total">
+        <span class="stat-label">Total del viaje</span>
+        <span class="stat-value">${money(totalGeneral)}</span>
+      </div>
+    </div>
+  </div><div class="zig"></div></div>`;
+
+  if(dias.length){
+    html += `<div class="ticket"><div class="ticket-body">
+      <p class="section-label">Alimentos por día <span style="font-weight:400;font-style:normal;font-size:11px;color:var(--gris-500);">límite ${money(limite)}/día</span></p>
+      <table class="mini-table">
+        <thead><tr><th>Fecha</th><th>Gastado</th><th>Estado</th></tr></thead>
+        <tbody>
+        ${dias.map(d=>{
+          const val = diasAlimentos[d];
+          const over = val > limite;
+          return `<tr>
+            <td>${d}</td>
+            <td>${money(val)}</td>
+            <td><span class="pill ${over?"pill-warn":"pill-ok"}">${over ? "⚠️ +"+money(val-limite) : "✅ dentro"}</span></td>
+          </tr>`;
+        }).join("")}
+        </tbody>
+      </table>
+    </div><div class="zig"></div></div>`;
+  }
+
+  html += `<div class="ticket"><div class="ticket-body">
+    <p class="section-label">Detalle de gastos</p>
+    ${gastos.map(g=>`
+      <div class="gasto-row">
+        <div class="gasto-info">
+          <b>${escapeHtml(g.descripcion || g.categoria)}</b>
+          <span>${g.fecha} · ${escapeHtml(g.categoria)} · ${escapeHtml(g.metodo)}</span>
+        </div>
+        <div class="gasto-monto">
+          ${money(g.monto)}
+          <button class="icon-btn danger mini2" data-del-gasto="${g.id}" title="Eliminar">🗑️</button>
+        </div>
+      </div>`).join("")}
+  </div></div>`;
+
+  html += `<button class="primary-btn" id="btn-export-viaje">Exportar este viaje a Markdown</button>`;
+
+  container.innerHTML = html;
+
+  container.querySelectorAll("[data-del-gasto]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      if(!confirm("¿Eliminar este gasto del viaje?")) return;
+      saveExpenses(loadExpenses().filter(e=>e.id !== btn.dataset.delGasto));
+      renderViajeSelect();
+      toast("Gasto eliminado");
+    });
+  });
+
+  document.getElementById("btn-export-viaje").addEventListener("click", ()=>{
+    const md = generateExpenseMarkdown(viaje, gastos, limite);
+    downloadFile(`Viaticos_${slugify(viaje)}_${fechaMin}_a_${fechaMax}.md`, md);
+    toast("Markdown de viáticos descargado ✅", true);
+  });
+}
+
+document.getElementById("btn-guardar-limite").addEventListener("click", ()=>{
+  const val = parseMonto(document.getElementById("limite-input").value);
+  if(isNaN(val) || val <= 0){
+    toast("Pon un límite válido");
+    return;
+  }
+  saveLimitToStorage(val);
+  toast("Límite guardado ✅", true);
+  renderResumenViaje();
+});
+
+document.getElementById("btn-export-all-viaticos").addEventListener("click", ()=>{
+  const all = loadExpenses();
+  if(all.length === 0){
+    toast("Todavía no hay gastos registrados");
+    return;
+  }
+  const viajes = getViajesOrdenados();
+  const limite = loadLimit();
+  const combined = viajes
+    .map(v => generateExpenseMarkdown(v, all.filter(e=>e.viaje===v).sort((a,b)=>a.fecha.localeCompare(b.fecha)), limite))
+    .join("\n\n---\n\n");
+  downloadFile(`Viaticos_Backup_${new Date().toISOString().slice(0,10)}.md`, combined);
+  toast("Backup de todos los viáticos descargado (sepáralo en Obsidian con --- )", true);
+});
+
+/* ---- Markdown de viáticos ---- */
+function generateExpenseMarkdown(viaje, gastos, limite){
+  const totales = {};
+  CATEGORIAS_VIATICOS.forEach(c => totales[c] = 0);
+  let totalGeneral = 0;
+  gastos.forEach(g=>{
+    const cat = CATEGORIAS_VIATICOS.includes(g.categoria) ? g.categoria : "Otro";
+    totales[cat] += g.monto;
+    totalGeneral += g.monto;
+  });
+
+  const diasAlimentos = {};
+  gastos.filter(g=>g.categoria === "Alimentos").forEach(g=>{
+    diasAlimentos[g.fecha] = (diasAlimentos[g.fecha] || 0) + g.monto;
+  });
+  const dias = Object.keys(diasAlimentos).sort();
+  const fechaMin = gastos[0].fecha;
+  const fechaMax = gastos[gastos.length - 1].fecha;
+
+  let md = `---\n`;
+  md += `tipo: viaticos-viaje\n`;
+  md += `viaje: ${ymlEscape(viaje)}\n`;
+  md += `periodo_inicio: ${fechaMin}\n`;
+  md += `periodo_fin: ${fechaMax}\n`;
+  md += `limite_diario_alimentos: ${limite}\n`;
+  md += `total_gastado: ${totalGeneral.toFixed(2)}\n`;
+  md += `tags: ["viaticos", "alsuper", "viaje"]\n`;
+  md += `---\n\n`;
+
+  md += `# 🧳 Viáticos — ${viaje}\n\n`;
+  md += `**Período:** ${fechaMin} a ${fechaMax}  \n`;
+  md += `**Total gastado:** ${money(totalGeneral)} MXN\n\n`;
+
+  md += `## 💰 Resumen por categoría\n\n`;
+  md += `| Categoría | Total |\n|---|---|\n`;
+  CATEGORIAS_VIATICOS.forEach(c=>{ md += `| ${c} | ${money(totales[c])} |\n`; });
+  md += `| **Total** | **${money(totalGeneral)}** |\n\n`;
+
+  if(dias.length){
+    md += `## 🍽️ Alimentos por día (límite ${money(limite)}/día)\n\n`;
+    md += `| Fecha | Gastado | Estado |\n|---|---|---|\n`;
+    dias.forEach(d=>{
+      const val = diasAlimentos[d];
+      const over = val > limite;
+      md += `| ${d} | ${money(val)} | ${over ? "⚠️ Excedido +"+money(val-limite) : "✅ Dentro del límite"} |\n`;
+    });
+    md += `\n`;
+  }
+
+  md += `## 🧾 Detalle de gastos\n\n`;
+  md += `| Fecha | Categoría | Descripción | Monto | Método |\n|---|---|---|---|---|\n`;
+  gastos.forEach(g=>{
+    const desc = (g.descripcion || "—").replace(/\|/g, "/");
+    md += `| ${g.fecha} | ${g.categoria} | ${desc} | ${money(g.monto)} | ${g.metodo} |\n`;
+  });
+
+  const conNotas = gastos.filter(g => g.notas && g.notas.trim());
+  if(conNotas.length){
+    md += `\n## 🗒️ Notas adicionales\n\n`;
+    conNotas.forEach(g=>{
+      md += `- **${g.fecha} · ${g.categoria}:** ${g.notas.trim()}\n`;
+    });
+  }
+
+  md += `\n---\n_Generado con Bitácora de Piso — AlSuper · ${new Date().toLocaleString("es-MX")}_\n`;
+  return md;
+}
+
+initGastoForm();
+
+/* ============ HELPERS ============ */
+function escapeHtml(s){
+  return (s||"").replace(/[&<>]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;" }[c]));
+}
+function escapeAttr(s){
+  return (s||"").replace(/"/g,"&quot;");
+}
+
+/* ============ INIT ============ */
+initNewVisitForm();
+
+/* ============ SERVICE WORKER ============ */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
