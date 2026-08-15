@@ -103,6 +103,33 @@
     color:var(--rojo);
     opacity:1;
   }
+
+  /* ---- mode switch (Bitácora / Viáticos) ---- */
+  .mode-switch{
+    display:flex;
+    gap:8px;
+    margin-top:14px;
+  }
+  .mode-btn{
+    flex:1;
+    border:1.5px solid rgba(255,255,255,.4);
+    background:rgba(255,255,255,.06);
+    color:var(--blanco);
+    padding:9px 8px;
+    font-size:12.5px;
+    font-weight:700;
+    font-family:var(--font-serif);
+    font-style:italic;
+    border-radius:10px;
+    opacity:.8;
+  }
+  .mode-btn.active{
+    background:var(--amarillo);
+    border-color:var(--amarillo);
+    color:#2A1D02;
+    opacity:1;
+  }
+
   main{
     max-width:640px;
     margin:0 auto;
@@ -110,6 +137,83 @@
   }
   .view{display:none;}
   .view.active{display:block;}
+
+  /* ---- stat cards (viáticos summary) ---- */
+  .stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .stat-card{
+    background:var(--gris-100);
+    border:1px solid var(--gris-300);
+    border-radius:10px;
+    padding:10px 12px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .stat-card.total{
+    background:var(--rojo);
+    border-color:var(--rojo-oscuro);
+    grid-column:1 / -1;
+  }
+  .stat-card.total .stat-label,
+  .stat-card.total .stat-value{color:var(--blanco);}
+  .stat-label{font-size:11px;font-weight:700;color:var(--gris-500);text-transform:uppercase;letter-spacing:.04em;}
+  .stat-value{font-size:18px;font-weight:800;font-family:var(--font-serif);color:var(--tinta);}
+
+  /* ---- mini table (alimentos por día) ---- */
+  table.mini-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.mini-table th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--gris-500);
+    padding:0 6px 6px;
+    border-bottom:1.5px solid var(--gris-300);
+  }
+  table.mini-table td{
+    padding:8px 6px;
+    border-bottom:1px solid var(--gris-300);
+  }
+  table.mini-table tr:last-child td{border-bottom:0;}
+
+  .pill{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:700;
+    padding:3px 9px;
+    border-radius:999px;
+  }
+  .pill-ok{background:rgba(30,127,69,.12);color:var(--ok);}
+  .pill-warn{background:rgba(166,25,46,.12);color:var(--rojo);}
+
+  .gasto-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    padding:11px 0;
+    border-bottom:1px solid var(--gris-300);
+  }
+  .gasto-row:last-child{border-bottom:0;}
+  .gasto-info b{display:block;font-size:14.5px;}
+  .gasto-info span{font-size:12px;color:var(--gris-500);}
+  .gasto-monto{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:800;
+    font-family:var(--font-serif);
+    white-space:nowrap;
+  }
+  .icon-btn.mini2{width:30px;height:30px;font-size:14px;}
 
   /* ---- ticket / receipt signature card ---- */
   .ticket{
@@ -343,17 +447,28 @@
     <span class="chip">AlSuper</span>
     <span class="chip" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);">Piso</span>
   </div>
-  <h1>Bitácora de Piso</h1>
-  <p>Visitas de tienda · checklist · exporta directo a Markdown</p>
+  <h1 id="app-title">Bitácora de Piso</h1>
+  <p id="app-sub">Visitas de tienda · checklist · exporta directo a Markdown</p>
   <span class="badge-offline"><span class="dot"></span> Funciona sin internet — guarda todo en este dispositivo</span>
-  <nav class="tabs">
+
+  <div class="mode-switch">
+    <button class="mode-btn active" data-mode="bitacora">🏬 Bitácora de Piso</button>
+    <button class="mode-btn" data-mode="viaticos">🧳 Viáticos de Viaje</button>
+  </div>
+
+  <nav class="tabs" id="tabs-bitacora">
     <button data-view="nueva" class="active">Nueva visita</button>
     <button data-view="historial">Historial</button>
     <button data-view="personalizar">Checklist</button>
   </nav>
+  <nav class="tabs" id="tabs-viaticos" style="display:none;">
+    <button data-view="viat-nuevo" class="active">Nuevo gasto</button>
+    <button data-view="viat-resumen">Resumen y viajes</button>
+  </nav>
 </header>
 
 <main>
+  <div id="mode-content-bitacora">
 
   <!-- ===================== NUEVA VISITA ===================== -->
   <section id="view-nueva" class="view active">
@@ -363,7 +478,8 @@
         <p class="section-label">Datos de la visita</p>
         <label class="field">
           <span>Tienda / Sucursal</span>
-          <input type="text" id="f-tienda" placeholder="Ej. AlSuper Jardín, AlSuper Independencia...">
+          <input type="text" id="f-tienda" list="sucursales-list" placeholder="Elige una sucursal o escribe una nueva...">
+          <datalist id="sucursales-list"></datalist>
         </label>
         <div class="row2">
           <label class="field">
@@ -432,7 +548,110 @@
     <button class="secondary-btn" id="btn-reset-template">Restaurar checklist original de AlSuper</button>
   </section>
 
+  </div>
+
+  <div id="mode-content-viaticos" style="display:none;">
+
+  <!-- ===================== VIÁTICOS: NUEVO GASTO ===================== -->
+  <section id="view-viat-nuevo" class="view active">
+    <div class="ticket">
+      <div class="ticket-body">
+        <p class="section-label">Registrar gasto de viaje</p>
+        <label class="field">
+          <span>Viaje / Motivo</span>
+          <input type="text" id="vg-viaje" list="viajes-list" placeholder="Ej. Viaje Monterrey Mayo 2026">
+          <datalist id="viajes-list"></datalist>
+        </label>
+        <div class="row2">
+          <label class="field">
+            <span>Fecha</span>
+            <input type="date" id="vg-fecha">
+          </label>
+          <label class="field">
+            <span>Categoría</span>
+            <select id="vg-categoria">
+              <option>Transporte</option>
+              <option>Alimentos</option>
+              <option>Hospedaje</option>
+              <option>Gasolina</option>
+              <option>Otro</option>
+            </select>
+          </label>
+        </div>
+        <label class="field">
+          <span>Descripción</span>
+          <input type="text" id="vg-desc" placeholder="Ej. Uber al aeropuerto, comida con cliente, casetas...">
+        </label>
+        <div class="row2">
+          <label class="field">
+            <span>Monto (MXN)</span>
+            <input type="text" inputmode="decimal" id="vg-monto" placeholder="0.00">
+          </label>
+          <label class="field">
+            <span>Método de pago</span>
+            <select id="vg-metodo">
+              <option>Efectivo</option>
+              <option>Tarjeta empresa</option>
+              <option>Tarjeta personal</option>
+              <option>Transferencia</option>
+            </select>
+          </label>
+        </div>
+        <label class="field" style="margin-bottom:0;">
+          <span>Notas (opcional)</span>
+          <textarea id="vg-notas" placeholder="Folio de factura, con quién, referencia..."></textarea>
+        </label>
+      </div>
+      <div class="zig"></div>
+    </div>
+
+    <button class="primary-btn" id="btn-guardar-gasto">Agregar gasto</button>
+    <p class="help" style="text-align:center;margin-top:10px;">Se guarda en este dispositivo. El Markdown completo del viaje se exporta desde "Resumen y viajes".</p>
+
+    <div class="ticket" id="hoy-resumen-card" style="display:none;">
+      <div class="ticket-body">
+        <p class="section-label">Alimentos registrados hoy <span id="hoy-fecha-label" style="font-style:normal;font-weight:400;font-size:11px;color:var(--gris-500);"></span></p>
+        <div id="hoy-alimentos-total"></div>
+      </div>
+      <div class="zig"></div>
+    </div>
+  </section>
+
+  <!-- ===================== VIÁTICOS: RESUMEN Y VIAJES ===================== -->
+  <section id="view-viat-resumen" class="view">
+    <div class="ticket">
+      <div class="ticket-body">
+        <p class="section-label">Selecciona un viaje</p>
+        <label class="field" style="margin-bottom:0;">
+          <select id="sel-viaje"></select>
+        </label>
+      </div>
+    </div>
+
+    <div id="resumen-content"></div>
+
+    <div class="ticket">
+      <div class="ticket-body">
+        <p class="section-label">Límite diario de alimentos</p>
+        <div class="row2">
+          <label class="field" style="margin-bottom:0;">
+            <span>Monto MXN / día</span>
+            <input type="text" inputmode="decimal" id="limite-input">
+          </label>
+          <div style="display:flex;align-items:flex-end;">
+            <button class="secondary-btn" id="btn-guardar-limite" style="margin-top:0;width:100%;">Guardar límite</button>
+          </div>
+        </div>
+        <p class="help" style="margin:10px 0 0;">Este límite aplica a todos tus viajes (el que te marca la empresa por día en alimentos).</p>
+      </div>
+    </div>
+
+    <button class="secondary-btn" id="btn-export-all-viaticos">Descargar todos los viáticos (.md combinado)</button>
+  </section>
+
+  </div>
 </main>
+
 
 <div class="toast" id="toast"></div>
 
@@ -459,10 +678,18 @@ const DEFAULT_TEMPLATE = [
     "Promociones vigentes bien señalizadas",
     "Sin discrepancias precio anaquel vs sistema"
   ]},
-  { nombre: "Ecommerce / Picking y Surtido", items: [
+  { nombre: "❄️ Cadena de Frío & Staging (E-grocery)", items: [
+    "Racks y lockers de staging limpios y rotulados (Seco/Frío/Congelado)",
+    "Congeladores y coolers en temperatura adecuada (≤ 4°C / ≤ -18°C)",
+    "Insumos y geles fríos congelados listos en módulo"
+  ]},
+  { nombre: "📦 Picking, Pack & Delivery (E-grocery)", items: [
     "Tiempos de picking dentro de meta",
+    "Pickers operando con carrito/bolsas normadas y escáner",
     "Personal de surtido identificado y capacitado",
+    "Cajones de Click & Collect libres y señalizados",
     "Zona de empaque/entrega ordenada",
+    "Validación visual de frescura/caducidad en perecederos",
     "Incidencias de pedidos (faltantes, sustituciones) registradas"
   ]},
   { nombre: "Personal y Atención", items: [
@@ -476,6 +703,43 @@ const DEFAULT_TEMPLATE = [
     "Sin riesgos eléctricos o estructurales visibles"
   ]}
 ];
+
+/* ---- Catálogo de sucursales (semilla por región) ---- */
+const LS_SUCURSALES_EXTRA = "as_sucursales_extra_v1";
+const SUCURSALES_SEED = [
+  // Comarca Lagunera (Coahuila / Durango)
+  "Vasconcelos (Torreón)", "Campesino (Torreón)", "Fresno (Torreón)", "Triana (Torreón)",
+  "Senderos (Torreón)", "Gómez Palacio - Hamburgo", "Gómez Palacio - Centro", "Lerdo",
+  // Región Saltillo
+  "Saltillo - Sucursal 1", "Saltillo - Sucursal 2", "Saltillo - Sucursal 3",
+  // Región Durango Capital
+  "Durango - Sucursal 1", "Durango - Sucursal 2", "Durango - Sucursal 3",
+  // Región Zacatecas
+  "Zacatecas - Sucursal 1", "Zacatecas - Sucursal 2"
+];
+
+function loadSucursalesExtra(){
+  const raw = localStorage.getItem(LS_SUCURSALES_EXTRA);
+  return raw ? JSON.parse(raw) : [];
+}
+function saveSucursalExtra(nombre){
+  if(!nombre) return;
+  const extra = loadSucursalesExtra();
+  if(!extra.includes(nombre) && !SUCURSALES_SEED.includes(nombre)){
+    extra.push(nombre);
+    localStorage.setItem(LS_SUCURSALES_EXTRA, JSON.stringify(extra));
+  }
+}
+function getSucursalesConocidas(){
+  const usadas = loadVisits().map(v=>v.tienda).filter(Boolean);
+  const todas = new Set([...SUCURSALES_SEED, ...loadSucursalesExtra(), ...usadas]);
+  return Array.from(todas).sort((a,b)=>a.localeCompare(b,'es'));
+}
+function renderSucursalesList(){
+  const dl = document.getElementById("sucursales-list");
+  if(!dl) return;
+  dl.innerHTML = getSucursalesConocidas().map(s=>`<option value="${escapeAttr(s)}">`).join("");
+}
 
 function loadTemplate(){
   const raw = localStorage.getItem(LS_TEMPLATE);
@@ -495,15 +759,40 @@ function saveVisits(v){
 let uidCounter = 0;
 function uid(){ uidCounter++; return "id" + Date.now().toString(36) + uidCounter; }
 
-/* ============ TABS ============ */
+/* ============ TABS (scoped per nav, so Bitácora/Viáticos don't step on each other) ============ */
 document.querySelectorAll("nav.tabs button").forEach(btn=>{
   btn.addEventListener("click", ()=>{
-    document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.remove("active"));
+    const nav = btn.closest("nav.tabs");
+    nav.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    const container = nav.id === "tabs-viaticos" ? document.getElementById("mode-content-viaticos") : document.getElementById("mode-content-bitacora");
+    container.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
     document.getElementById("view-"+btn.dataset.view).classList.add("active");
     if(btn.dataset.view === "historial") renderHistory();
     if(btn.dataset.view === "personalizar") renderTemplateEditor();
+    if(btn.dataset.view === "viat-resumen") { document.getElementById("limite-input").value = loadLimit(); renderViajeSelect(); }
+  });
+});
+
+/* ============ MODE SWITCH (Bitácora de Piso / Viáticos de Viaje) ============ */
+document.querySelectorAll(".mode-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".mode-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const mode = btn.dataset.mode;
+    const isBitacora = mode === "bitacora";
+    document.getElementById("tabs-bitacora").style.display = isBitacora ? "flex" : "none";
+    document.getElementById("tabs-viaticos").style.display = isBitacora ? "none" : "flex";
+    document.getElementById("mode-content-bitacora").style.display = isBitacora ? "" : "none";
+    document.getElementById("mode-content-viaticos").style.display = isBitacora ? "none" : "";
+    document.getElementById("app-title").textContent = isBitacora ? "Bitácora de Piso" : "Viáticos de Viaje";
+    document.getElementById("app-sub").textContent = isBitacora
+      ? "Visitas de tienda · checklist · exporta directo a Markdown"
+      : "Transporte · alimentos · hospedaje · gasolina · exporta directo a Markdown";
+    if(!isBitacora){
+      document.getElementById("limite-input").value = loadLimit();
+      renderViajeSelect();
+    }
   });
 });
 
@@ -523,6 +812,7 @@ function initNewVisitForm(){
   document.getElementById("f-fecha").value = today.toISOString().slice(0,10);
   document.getElementById("f-hora").value = today.toTimeString().slice(0,5);
   document.getElementById("f-tienda").value = "";
+  renderSucursalesList();
   document.getElementById("f-resumen").value = "";
   document.getElementById("f-notasfinales").value = "";
   document.getElementById("f-tags").value = "";
@@ -642,6 +932,7 @@ document.getElementById("btn-guardar").addEventListener("click", ()=>{
     categorias: JSON.parse(JSON.stringify(currentCategories)),
     creado: new Date().toISOString()
   };
+  saveSucursalExtra(tienda);
   const visits = loadVisits();
   visits.unshift(visit);
   saveVisits(visits);
@@ -852,6 +1143,327 @@ document.getElementById("btn-reset-template").addEventListener("click", ()=>{
   renderTemplateEditor();
   toast("Checklist restaurado");
 });
+
+/* ================================================================
+   VIÁTICOS DE VIAJE
+   ================================================================ */
+const LS_EXPENSES = "as_viaticos_v1";
+const LS_LIMIT = "as_limite_alimentos_v1";
+const CATEGORIAS_VIATICOS = ["Transporte","Alimentos","Hospedaje","Gasolina","Otro"];
+
+function loadExpenses(){
+  const raw = localStorage.getItem(LS_EXPENSES);
+  return raw ? JSON.parse(raw) : [];
+}
+function saveExpenses(list){
+  localStorage.setItem(LS_EXPENSES, JSON.stringify(list));
+}
+function loadLimit(){
+  const raw = localStorage.getItem(LS_LIMIT);
+  return raw ? parseFloat(raw) : 300;
+}
+function saveLimitToStorage(n){
+  localStorage.setItem(LS_LIMIT, String(n));
+}
+function parseMonto(raw){
+  return parseFloat(String(raw).trim().replace(",", "."));
+}
+function money(n){
+  return "$" + (n || 0).toLocaleString("es-MX", {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+/* ---- Nuevo gasto: init + guardar ---- */
+function initGastoForm(){
+  const fechaInput = document.getElementById("vg-fecha");
+  if(!fechaInput.value){
+    fechaInput.value = new Date().toISOString().slice(0,10);
+  }
+  const listEl = document.getElementById("viajes-list");
+  listEl.innerHTML = getViajesOrdenados().map(v=>`<option value="${escapeAttr(v)}">`).join("");
+}
+
+document.getElementById("btn-guardar-gasto").addEventListener("click", ()=>{
+  const viaje = document.getElementById("vg-viaje").value.trim();
+  const fecha = document.getElementById("vg-fecha").value;
+  const categoria = document.getElementById("vg-categoria").value;
+  const descripcion = document.getElementById("vg-desc").value.trim();
+  const monto = parseMonto(document.getElementById("vg-monto").value);
+  const metodo = document.getElementById("vg-metodo").value;
+  const notas = document.getElementById("vg-notas").value.trim();
+
+  if(!viaje){
+    toast("Falta el nombre del viaje 🙄");
+    document.getElementById("vg-viaje").focus();
+    return;
+  }
+  if(!fecha){
+    toast("Falta la fecha");
+    return;
+  }
+  if(isNaN(monto) || monto <= 0){
+    toast("Pon un monto válido");
+    document.getElementById("vg-monto").focus();
+    return;
+  }
+
+  const list = loadExpenses();
+  list.push({
+    id: uid(), viaje, fecha, categoria, descripcion, monto, metodo, notas,
+    creado: new Date().toISOString()
+  });
+  saveExpenses(list);
+
+  document.getElementById("vg-desc").value = "";
+  document.getElementById("vg-monto").value = "";
+  document.getElementById("vg-notas").value = "";
+  document.getElementById("vg-desc").focus();
+  document.getElementById("viajes-list").innerHTML = getViajesOrdenados().map(v=>`<option value="${escapeAttr(v)}">`).join("");
+
+  updateHoyResumen(viaje, fecha);
+  toast("Gasto agregado ✅", true);
+});
+
+function updateHoyResumen(viaje, fecha){
+  const limite = loadLimit();
+  const gastosHoy = loadExpenses().filter(e => e.viaje === viaje && e.fecha === fecha && e.categoria === "Alimentos");
+  const card = document.getElementById("hoy-resumen-card");
+  if(gastosHoy.length === 0){
+    card.style.display = "none";
+    return;
+  }
+  const total = gastosHoy.reduce((s,e)=>s+e.monto, 0);
+  const over = total > limite;
+  card.style.display = "block";
+  document.getElementById("hoy-fecha-label").textContent = "· " + fecha;
+  document.getElementById("hoy-alimentos-total").innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card"><span class="stat-label">Gastado hoy</span><span class="stat-value">${money(total)}</span></div>
+      <div class="stat-card"><span class="stat-label">Límite del día</span><span class="stat-value">${money(limite)}</span></div>
+    </div>
+    <p style="margin:12px 0 0;text-align:center;">
+      <span class="pill ${over ? "pill-warn" : "pill-ok"}">${over ? "⚠️ Excedido por " + money(total - limite) : "✅ Dentro del límite"}</span>
+    </p>`;
+}
+
+/* ---- Resumen y viajes ---- */
+function getViajesOrdenados(){
+  const exp = loadExpenses();
+  const ultimaFecha = {};
+  exp.forEach(e=>{
+    if(!e.viaje) return;
+    if(!ultimaFecha[e.viaje] || e.fecha > ultimaFecha[e.viaje]) ultimaFecha[e.viaje] = e.fecha;
+  });
+  return Object.keys(ultimaFecha).sort((a,b)=> ultimaFecha[b].localeCompare(ultimaFecha[a]));
+}
+
+function renderViajeSelect(){
+  const sel = document.getElementById("sel-viaje");
+  const prev = sel.value;
+  const viajes = getViajesOrdenados();
+  sel.innerHTML = viajes.length
+    ? viajes.map(v=>`<option value="${escapeAttr(v)}">${escapeHtml(v)}</option>`).join("")
+    : `<option value="">— sin viajes registrados todavía —</option>`;
+  if(viajes.includes(prev)) sel.value = prev;
+  if(!sel.onchange){
+    sel.onchange = renderResumenViaje;
+  }
+  renderResumenViaje();
+}
+
+function renderResumenViaje(){
+  const viaje = document.getElementById("sel-viaje").value;
+  const container = document.getElementById("resumen-content");
+  const gastos = loadExpenses().filter(e => e.viaje === viaje).sort((a,b)=> a.fecha.localeCompare(b.fecha));
+
+  if(!viaje || gastos.length === 0){
+    container.innerHTML = `<div class="ticket"><div class="empty"><div class="big">🧳</div>Aún no hay gastos registrados para este viaje.<br>Ve a "Nuevo gasto" para empezar.</div></div>`;
+    return;
+  }
+
+  const limite = loadLimit();
+  const totales = {};
+  CATEGORIAS_VIATICOS.forEach(c => totales[c] = 0);
+  let totalGeneral = 0;
+  gastos.forEach(g=>{
+    const cat = CATEGORIAS_VIATICOS.includes(g.categoria) ? g.categoria : "Otro";
+    totales[cat] += g.monto;
+    totalGeneral += g.monto;
+  });
+
+  const diasAlimentos = {};
+  gastos.filter(g=>g.categoria === "Alimentos").forEach(g=>{
+    diasAlimentos[g.fecha] = (diasAlimentos[g.fecha] || 0) + g.monto;
+  });
+  const dias = Object.keys(diasAlimentos).sort();
+  const fechaMin = gastos[0].fecha;
+  const fechaMax = gastos[gastos.length - 1].fecha;
+
+  let html = `<div class="ticket"><div class="ticket-body">
+    <p class="section-label">Resumen — ${escapeHtml(viaje)}</p>
+    <p style="font-size:12.5px;color:var(--gris-500);margin:-8px 0 12px;">${fechaMin} a ${fechaMax} · ${gastos.length} gasto${gastos.length===1?"":"s"} registrado${gastos.length===1?"":"s"}</p>
+    <div class="stat-grid">
+      ${CATEGORIAS_VIATICOS.map(c=>`
+        <div class="stat-card">
+          <span class="stat-label">${c}</span>
+          <span class="stat-value">${money(totales[c])}</span>
+        </div>`).join("")}
+      <div class="stat-card total">
+        <span class="stat-label">Total del viaje</span>
+        <span class="stat-value">${money(totalGeneral)}</span>
+      </div>
+    </div>
+  </div><div class="zig"></div></div>`;
+
+  if(dias.length){
+    html += `<div class="ticket"><div class="ticket-body">
+      <p class="section-label">Alimentos por día <span style="font-weight:400;font-style:normal;font-size:11px;color:var(--gris-500);">límite ${money(limite)}/día</span></p>
+      <table class="mini-table">
+        <thead><tr><th>Fecha</th><th>Gastado</th><th>Estado</th></tr></thead>
+        <tbody>
+        ${dias.map(d=>{
+          const val = diasAlimentos[d];
+          const over = val > limite;
+          return `<tr>
+            <td>${d}</td>
+            <td>${money(val)}</td>
+            <td><span class="pill ${over?"pill-warn":"pill-ok"}">${over ? "⚠️ +"+money(val-limite) : "✅ dentro"}</span></td>
+          </tr>`;
+        }).join("")}
+        </tbody>
+      </table>
+    </div><div class="zig"></div></div>`;
+  }
+
+  html += `<div class="ticket"><div class="ticket-body">
+    <p class="section-label">Detalle de gastos</p>
+    ${gastos.map(g=>`
+      <div class="gasto-row">
+        <div class="gasto-info">
+          <b>${escapeHtml(g.descripcion || g.categoria)}</b>
+          <span>${g.fecha} · ${escapeHtml(g.categoria)} · ${escapeHtml(g.metodo)}</span>
+        </div>
+        <div class="gasto-monto">
+          ${money(g.monto)}
+          <button class="icon-btn danger mini2" data-del-gasto="${g.id}" title="Eliminar">🗑️</button>
+        </div>
+      </div>`).join("")}
+  </div></div>`;
+
+  html += `<button class="primary-btn" id="btn-export-viaje">Exportar este viaje a Markdown</button>`;
+
+  container.innerHTML = html;
+
+  container.querySelectorAll("[data-del-gasto]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      if(!confirm("¿Eliminar este gasto del viaje?")) return;
+      saveExpenses(loadExpenses().filter(e=>e.id !== btn.dataset.delGasto));
+      renderViajeSelect();
+      toast("Gasto eliminado");
+    });
+  });
+
+  document.getElementById("btn-export-viaje").addEventListener("click", ()=>{
+    const md = generateExpenseMarkdown(viaje, gastos, limite);
+    downloadFile(`Viaticos_${slugify(viaje)}_${fechaMin}_a_${fechaMax}.md`, md);
+    toast("Markdown de viáticos descargado ✅", true);
+  });
+}
+
+document.getElementById("btn-guardar-limite").addEventListener("click", ()=>{
+  const val = parseMonto(document.getElementById("limite-input").value);
+  if(isNaN(val) || val <= 0){
+    toast("Pon un límite válido");
+    return;
+  }
+  saveLimitToStorage(val);
+  toast("Límite guardado ✅", true);
+  renderResumenViaje();
+});
+
+document.getElementById("btn-export-all-viaticos").addEventListener("click", ()=>{
+  const all = loadExpenses();
+  if(all.length === 0){
+    toast("Todavía no hay gastos registrados");
+    return;
+  }
+  const viajes = getViajesOrdenados();
+  const limite = loadLimit();
+  const combined = viajes
+    .map(v => generateExpenseMarkdown(v, all.filter(e=>e.viaje===v).sort((a,b)=>a.fecha.localeCompare(b.fecha)), limite))
+    .join("\n\n---\n\n");
+  downloadFile(`Viaticos_Backup_${new Date().toISOString().slice(0,10)}.md`, combined);
+  toast("Backup de todos los viáticos descargado (sepáralo en Obsidian con --- )", true);
+});
+
+/* ---- Markdown de viáticos ---- */
+function generateExpenseMarkdown(viaje, gastos, limite){
+  const totales = {};
+  CATEGORIAS_VIATICOS.forEach(c => totales[c] = 0);
+  let totalGeneral = 0;
+  gastos.forEach(g=>{
+    const cat = CATEGORIAS_VIATICOS.includes(g.categoria) ? g.categoria : "Otro";
+    totales[cat] += g.monto;
+    totalGeneral += g.monto;
+  });
+
+  const diasAlimentos = {};
+  gastos.filter(g=>g.categoria === "Alimentos").forEach(g=>{
+    diasAlimentos[g.fecha] = (diasAlimentos[g.fecha] || 0) + g.monto;
+  });
+  const dias = Object.keys(diasAlimentos).sort();
+  const fechaMin = gastos[0].fecha;
+  const fechaMax = gastos[gastos.length - 1].fecha;
+
+  let md = `---\n`;
+  md += `tipo: viaticos-viaje\n`;
+  md += `viaje: ${ymlEscape(viaje)}\n`;
+  md += `periodo_inicio: ${fechaMin}\n`;
+  md += `periodo_fin: ${fechaMax}\n`;
+  md += `limite_diario_alimentos: ${limite}\n`;
+  md += `total_gastado: ${totalGeneral.toFixed(2)}\n`;
+  md += `tags: ["viaticos", "alsuper", "viaje"]\n`;
+  md += `---\n\n`;
+
+  md += `# 🧳 Viáticos — ${viaje}\n\n`;
+  md += `**Período:** ${fechaMin} a ${fechaMax}  \n`;
+  md += `**Total gastado:** ${money(totalGeneral)} MXN\n\n`;
+
+  md += `## 💰 Resumen por categoría\n\n`;
+  md += `| Categoría | Total |\n|---|---|\n`;
+  CATEGORIAS_VIATICOS.forEach(c=>{ md += `| ${c} | ${money(totales[c])} |\n`; });
+  md += `| **Total** | **${money(totalGeneral)}** |\n\n`;
+
+  if(dias.length){
+    md += `## 🍽️ Alimentos por día (límite ${money(limite)}/día)\n\n`;
+    md += `| Fecha | Gastado | Estado |\n|---|---|---|\n`;
+    dias.forEach(d=>{
+      const val = diasAlimentos[d];
+      const over = val > limite;
+      md += `| ${d} | ${money(val)} | ${over ? "⚠️ Excedido +"+money(val-limite) : "✅ Dentro del límite"} |\n`;
+    });
+    md += `\n`;
+  }
+
+  md += `## 🧾 Detalle de gastos\n\n`;
+  md += `| Fecha | Categoría | Descripción | Monto | Método |\n|---|---|---|---|---|\n`;
+  gastos.forEach(g=>{
+    const desc = (g.descripcion || "—").replace(/\|/g, "/");
+    md += `| ${g.fecha} | ${g.categoria} | ${desc} | ${money(g.monto)} | ${g.metodo} |\n`;
+  });
+
+  const conNotas = gastos.filter(g => g.notas && g.notas.trim());
+  if(conNotas.length){
+    md += `\n## 🗒️ Notas adicionales\n\n`;
+    conNotas.forEach(g=>{
+      md += `- **${g.fecha} · ${g.categoria}:** ${g.notas.trim()}\n`;
+    });
+  }
+
+  md += `\n---\n_Generado con Bitácora de Piso — AlSuper · ${new Date().toLocaleString("es-MX")}_\n`;
+  return md;
+}
+
+initGastoForm();
 
 /* ============ HELPERS ============ */
 function escapeHtml(s){
