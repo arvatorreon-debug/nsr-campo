@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Bitácora de Piso — AlSuper</title>
+<title>Bitácora de Pickup</title>
 <meta name="theme-color" content="#A6192E">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
@@ -447,12 +447,12 @@
     <span class="chip">AlSuper</span>
     <span class="chip" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);">Piso</span>
   </div>
-  <h1 id="app-title">Bitácora de Piso</h1>
+  <h1 id="app-title">Bitácora de Pickup</h1>
   <p id="app-sub">Visitas de tienda · checklist · exporta directo a Markdown</p>
-  <span class="badge-offline"><span class="dot"></span> Funciona sin internet — guarda todo en este dispositivo</span>
+  <span class="badge-offline"><span class="dot"></span> Funciona Offline — guarda todo en este dispositivo</span>
 
   <div class="mode-switch">
-    <button class="mode-btn active" data-mode="bitacora">🏬 Bitácora de Piso</button>
+    <button class="mode-btn active" data-mode="bitacora">🏬 Bitácora de Pickup</button>
     <button class="mode-btn" data-mode="viaticos">🧳 Viáticos de Viaje</button>
   </div>
 
@@ -661,61 +661,63 @@ const LS_VISITS = "as_visitas_v1";
 const LS_TEMPLATE = "as_template_v1";
 
 const DEFAULT_TEMPLATE = [
-  { nombre: "Presentación y Limpieza", items: [
+  { nombre: "Presentación y Limpieza Pickup", items: [
     "Piso, pasillos y accesos limpios",
-    "Anaqueles surtidos y frentados",
-    "Cámaras frías y refrigeradores en orden",
-    "Área de cajas limpia y funcional"
+    "Racks y Mobiliario acomodados",
+    "Congeladores y refrigeradores en orden",
+    "Bitácoras y resguardo de activos",
+    "Cajones de estacionamiento limpios y señalizados",
+    "Personal Identificado y buena actitud"
   ]},
-  { nombre: "Abasto e Inventario", items: [
-    "Sin quiebres de stock en productos clave",
-    "Rotación correcta (PEPS)",
-    "Recepción de mercancía sin cuellos de botella",
-    "Merma dentro de rango esperado"
+  { nombre: "❄️📦 Picking, Packing, Staging", items: [
+    "Tiempos dentro de la meta",
+    "Pickers con carrito y Zebra",
+    "Insumos y geles fríos congelados listos en módulo",
+    "Zona Staging limpia y ordenada",
+    "Auditorías de Prevención/Encargado"
   ]},
-  { nombre: "Precios y Etiquetado", items: [
-    "Etiquetas de precio correctas y visibles",
-    "Promociones vigentes bien señalizadas",
-    "Sin discrepancias precio anaquel vs sistema"
-  ]},
-  { nombre: "❄️ Cadena de Frío & Staging (E-grocery)", items: [
-    "Racks y lockers de staging limpios y rotulados (Seco/Frío/Congelado)",
-    "Congeladores y coolers en temperatura adecuada (≤ 4°C / ≤ -18°C)",
-    "Insumos y geles fríos congelados listos en módulo"
-  ]},
-  { nombre: "📦 Picking, Pack & Delivery (E-grocery)", items: [
-    "Tiempos de picking dentro de meta",
-    "Pickers operando con carrito/bolsas normadas y escáner",
-    "Personal de surtido identificado y capacitado",
+  { nombre: "🚘 Servicio de Pickup", items: [
+    "Personal identificado y en el área",
+    "Tiempo óptimo de espera del cliente",
+    "Actitud de servicio",
     "Cajones de Click & Collect libres y señalizados",
-    "Zona de empaque/entrega ordenada",
-    "Validación visual de frescura/caducidad en perecederos",
-    "Incidencias de pedidos (faltantes, sustituciones) registradas"
+    "Handheld(Zebra) y TPV"
   ]},
-  { nombre: "Personal y Atención", items: [
-    "Personal uniformado y en su puesto",
+  { nombre: "🚕 Delivery / Drivers", items: [
+    "Personal identificado",
     "Actitud de servicio adecuada",
-    "Cobertura de turno completa"
+    "Rutas correctas y a tiempo",
+    "Manejo correcto de productos",
+    "Cadena de frío (hieleras y geles)"
   ]},
-  { nombre: "Seguridad y Mantenimiento", items: [
+  { nombre: "🚧 Seguridad y Mantenimiento", items: [
     "Salidas de emergencia despejadas",
     "Extintores vigentes y accesibles",
-    "Sin riesgos eléctricos o estructurales visibles"
+    "Sin riesgos eléctricos o estructurales visibles",
+    "Iluminación y ventilación adecuada",
+    "Cámara de seguridad en buen estado",
+    "Solo personal autorizado en el área"
+  ]},
+  { nombre: "📲 Sistemas y App Móvil", items: [
+    "Desempeño Correcto de Instaleap",
+    "Sync Catálogo Tienda/App",
+    "Red e Internet",
+    "Equipos funcionando y en buen estado"
   ]}
 ];
 
 /* ---- Catálogo de sucursales (semilla por región) ---- */
 const LS_SUCURSALES_EXTRA = "as_sucursales_extra_v1";
 const SUCURSALES_SEED = [
-  // Comarca Lagunera (Coahuila / Durango)
-  "Vasconcelos (Torreón)", "Campesino (Torreón)", "Fresno (Torreón)", "Triana (Torreón)",
-  "Senderos (Torreón)", "Gómez Palacio - Hamburgo", "Gómez Palacio - Centro", "Lerdo",
-  // Región Saltillo
-  "Saltillo - Sucursal 1", "Saltillo - Sucursal 2", "Saltillo - Sucursal 3",
-  // Región Durango Capital
-  "Durango - Sucursal 1", "Durango - Sucursal 2", "Durango - Sucursal 3",
-  // Región Zacatecas
-  "Zacatecas - Sucursal 1", "Zacatecas - Sucursal 2"
+  // Laguna (Coahuila / Durango)
+  "Vasconcelos ", "El Campesino", "La Rosita", "Triana",
+  "Senderos (Laguna)", "Las Rosas (Laguna)", "Las Etnias", "Fresh Market",
+  // Saltillo
+  "Las Maravillas", "LaFragua", "San Patricio", "Toreo", "Venustiano Carranza", "Lourdes",
+  // Durango
+  "Guadiana", "Mezquital", "Domingo Arrieta", "Francisco Villa",
+  // Zacatecas
+  "Fresnillo", "Distrito 925"
 ];
 
 function loadSucursalesExtra(){
@@ -995,7 +997,7 @@ function generateMarkdown(v){
     md += `## 📌 Observaciones generales / pendientes\n${v.notasFinales}\n\n`;
   }
 
-  md += `---\n_Generado con Bitácora de Piso — AlSuper · ${new Date(v.creado).toLocaleString("es-MX")}_\n`;
+  md += `---\n_Generado con Bitácora de Pickup — José Rojas · ${new Date(v.creado).toLocaleString("es-MX")}_\n`;
   md += `\n🔗 Ver también: [[Dashboard Bitacora]]\n`;
   return md;
 }
